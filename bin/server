@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+const PUBLISH_HOSTS = ["localhost"];
+const SUBSCRIBE_PORTS = [8090, 8091, 8092, 8093, 8094];
+
+var redisIo = require('../redis.io.js');
+var server = new redisIo.server(PUBLISH_HOSTS, SUBSCRIBE_PORTS);
+
+process.on('SIGTERM', function() {
+	server.shutdown();
+	process.exit();
+});
