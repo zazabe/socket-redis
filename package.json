@@ -1,10 +1,10 @@
 {
 	"name": "socket-redis",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Redis to Socket.io relay",
-	"main": "redis.io.js",
+	"main": "socket-redis.js",
 	"bin": {
-		"socket-redis": "./bin/server"
+		"socket-redis": "./bin/socket-redis.js"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
@@ -17,6 +17,7 @@
 	"license": "BSD",
 	"dependencies": {
 		"socket.io": "0.9.10",
-		"redis": "0.7.2"
+		"redis": "0.7.2",
+		"optimist": "0.3.4"
 	}
 }
