@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 var socketRedis = require('../socket-redis.js'),
+	fs = require('fs'),
+	path = require('path'),
 	cluster = require('cluster'),
 	argv = require('optimist').default('redis-hosts', 'localhost').default('socket-port', '8090').default('log-dir', '/var/log/socket-redis/').argv,
 	numCPUs = require('os').cpus().length;
@@ -8,11 +10,19 @@ var redisHosts = argv['redis-hosts'].split(','),
 	socketPort = argv['socket-port'],
 	logDir = argv['log-dir'];
 
-var accessLog = require('fs').createWriteStream(logDir + '/access.log', {'flags':'a+', 'encoding':'utf8', 'mode':0644});
-process.__defineGetter__('stdout', function() { return accessLog; });
+fs.mkdirRecursive = function (directory) {
+	var pathParts = path.normalize(directory).replace(/\/$/, '').split(path.sep);
+	for (var i = 0; i < pathParts.length; i++) {
+		var parentDirectory = pathParts.slice(0, i + 1).join(path.sep) + '/';
+		fs.mkdir(parentDirectory);
+	}
+}
 
-var errorLog = require('fs').createWriteStream(logDir + '/error.log', {'flags':'a+', 'encoding':'utf8', 'mode':0644});
-process.__defineGetter__('stderr', function() { return errorLog; });
+fs.mkdirRecursive(logDir);
+
+var log = fs.createWriteStream(logDir + '/general.log', {'flags':'a+', 'encoding':'utf8', 'mode':0644});
+process.__defineGetter__('stdout', function() { return log; });
+process.__defineGetter__('stderr', function() { return log; });
 process.on('uncaughtException', function (e) { process.stderr.write('Uncaught exception: ' + e + '\n'); });
 
 if (cluster.isMaster) {
