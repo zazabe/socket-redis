@@ -16,7 +16,7 @@ fs.mkdirRecursive = function (directory) {
 		var parentDirectory = pathParts.slice(0, i + 1).join(path.sep) + '/';
 		fs.mkdir(parentDirectory);
 	}
-}
+};
 
 fs.mkdirRecursive(logDir);
 
