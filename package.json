@@ -16,8 +16,8 @@
 	"author": "Cargomedia",
 	"license": "BSD",
 	"dependencies": {
-		"socket.io": "0.9.10",
-		"redis": "0.7.2",
-		"optimist": "0.3.4"
-	}
+        "sockjs": "0.3.3",
+        "redis": "0.7.2",
+        "optimist": "0.3.4"
+    }
 }

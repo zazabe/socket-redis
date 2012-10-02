@@ -25,20 +25,8 @@ process.__defineGetter__('stdout', function() { return log; });
 process.__defineGetter__('stderr', function() { return log; });
 process.on('uncaughtException', function (e) { process.stderr.write('Uncaught exception: ' + e + '\n'); });
 
-if (cluster.isMaster) {
-	var publisher = new socketRedis.Server(redisHosts);
-	for (var cpu = 0; cpu < numCPUs; cpu++) {
-		cluster.fork();
-	}
-	publisher.onMessage = function (channel, message) {
-		for (var i in cluster.workers) {
-			var worker = cluster.workers[i];
-			worker.send({channel: channel, message: message});
-		}
-	};
-} else {
-	var worker = new socketRedis.Worker(socketPort);
-	process.on('message', function (data) {
-		worker.publish(data.channel, data.message);
-	});
-}
+var publisher = new socketRedis.Server(redisHosts);
+var worker = new socketRedis.Worker(socketPort);
+publisher.onMessage = function (channel, message) {
+    worker.publish(channel, message);
+};
