@@ -1,7 +1,7 @@
 {
 	"name": "socket-redis",
-	"version": "0.0.4",
-	"description": "Redis to Socket.io relay",
+	"version": "0.0.5",
+	"description": "Redis to SockJS relay",
 	"main": "socket-redis.js",
 	"bin": {
 		"socket-redis": "./bin/socket-redis.js"
@@ -11,7 +11,7 @@
 	},
 	"repository": "",
 	"keywords": [
-		"redis", "socket.io", "relay", "brigde"
+		"redis", "sockjs", "relay", "brigde"
 	],
 	"author": "Cargomedia",
 	"license": "BSD",
