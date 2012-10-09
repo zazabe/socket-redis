@@ -31,5 +31,12 @@ socketPorts.forEach(function (socketPort) {
 	if (logDir) {
 		args.push('--log-dir=' + logDir);
 	}
-	publisher.addWorker(childProcess.fork(__dirname + '/worker.js', args));
+	var startWorker = function () {
+		var worker = childProcess.fork(__dirname + '/worker.js', args);
+		publisher.addWorker(worker);
+		worker.on('exit', function () {
+			startWorker();
+		});
+	}
+	startWorker();
 });
