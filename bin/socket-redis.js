@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 var socketRedis = require('../socket-redis.js'),
+	childProcess = require('child_process'),
 	fs = require('fs'),
 	path = require('path'),
-	argv = require('optimist').default('redis-hosts', 'localhost').default('socket-port', '8090').default('log-dir', null).default('sockjs-url', null).argv;
+	argv = require('optimist').default('redis-hosts', 'localhost').default('socket-ports', '8090').default('log-dir', null).default('sockjs-url', null).argv;
 
 var redisHosts = argv['redis-hosts'].split(','),
-	socketPort = argv['socket-port'],
-	sockjsUrl = argv['sockjs-url'],
+	socketPorts = argv['socket-ports'].split(','),
 	logDir = argv['log-dir'];
 
 fs.mkdirRecursive = function(directory) {
@@ -26,7 +26,10 @@ if (logDir) {
 }
 
 var publisher = new socketRedis.Server(redisHosts);
-var worker = new socketRedis.Worker(socketPort, sockjsUrl);
-publisher.onMessage = function(channel, message) {
-	worker.publish(channel, message);
-};
+socketPorts.forEach(function (socketPort) {
+	var args = ['--socket-port=' + socketPort];
+	if (logDir) {
+		args.push('--log-dir=' + logDir);
+	}
+	publisher.addWorker(childProcess.fork(__dirname + '/worker.js', args));
+});
