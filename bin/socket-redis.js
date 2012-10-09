@@ -5,8 +5,8 @@ var socketRedis = require('../socket-redis.js'),
 	path = require('path'),
 	argv = require('optimist').default('redis-hosts', 'localhost').default('socket-ports', '8090').default('log-dir', null).default('sockjs-url', null).argv;
 
-var redisHosts = argv['redis-hosts'].split(','),
-	socketPorts = argv['socket-ports'].split(','),
+var redisHosts = String(argv['redis-hosts']).split(','),
+	socketPorts = String(argv['socket-ports']).split(','),
 	logDir = argv['log-dir'];
 
 fs.mkdirRecursive = function(directory) {
