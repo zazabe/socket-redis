@@ -37,6 +37,11 @@ socketPorts.forEach(function (socketPort) {
 		worker.on('exit', function () {
 			startWorker();
 		});
-	}
+	};
 	startWorker();
+});
+
+process.on('SIGTERM', function () {
+	publisher.killWorkers();
+	process.exit();
 });
