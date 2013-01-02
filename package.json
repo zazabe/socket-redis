@@ -17,7 +17,7 @@
 	"license": "BSD",
 	"dependencies": {
         "sockjs": "0.3.4",
-        "redis": "0.7.2",
+        "redis": "0.8.1",
         "optimist": "0.3.4"
     }
 }
