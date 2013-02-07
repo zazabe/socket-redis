@@ -11,7 +11,7 @@
 	},
 	"repository": "",
 	"keywords": [
-		"redis", "sockjs", "relay", "brigde"
+		"redis", "sockjs", "relay", "bridge"
 	],
 	"author": "Cargomedia",
 	"license": "BSD",
