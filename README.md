@@ -1,5 +1,6 @@
-socket-redis
-=========
+# socket-redis
+
+## About
 
 Script collects events from Redis pub/sub `socket-redis-down` to distribute them to SockJS workers.
 
@@ -7,8 +8,16 @@ Script publishes events to Redis pub/sub `socket-redis-up` from SockJS workers.
 
 Specify multipe ports to fork several worker processes.
 
-Arguments
----------
+## Installation
+
+Package is in nodejs and is available through npm registry:
+```
+npm install socket-redis [-g]
+``` 
+
+## Running
+
+You can run socket-redis using default arguments or specify them on your own. 
 
 `--redis-host` Specify host of redis server. Defaults to `localhost`.
 
