@@ -2,22 +2,22 @@
 var socketRedis = require('../socket-redis.js'),
 	childProcess = require('child_process'),
 	utils = require('../lib/utils.js'),
-	optimist = require('optimist').default('log-dir', null).default('sockjs-url', null),
+	optimist = require('optimist').default('log-dir', null),
 	argv = optimist.argv,
+	redisHost = argv['redis-host'],
 	logDir = argv['log-dir'];
 
 if (logDir) {
-	utils.logProcessInto(process, logDir + '/general.log');
+	utils.logProcessInto(process, logDir + '/socket-redis.log');
 }
 
-if (!argv.slave) {
-	argv = optimist.default('redis-hosts', 'localhost').default('socket-ports', '8090').argv;
-	var redisHosts = argv['redis-hosts'].split(','),
-		socketPorts = argv['socket-ports'].split(','),
-		publisher = new socketRedis.Server(redisHosts);
+if (!process.send) {
+	argv = optimist.default('redis-host', 'localhost').default('socket-ports', '8090').argv;
+	var socketPorts = argv['socket-ports'].split(','),
+		publisher = new socketRedis.Server(redisHost);
 
 	socketPorts.forEach(function (socketPort) {
-		var args = ['--slave', '--socket-port=' + socketPort];
+		var args = ['--socket-port=' + socketPort];
 		if (logDir) {
 			args.push('--log-dir=' + logDir);
 		}
@@ -26,6 +26,9 @@ if (!argv.slave) {
 			publisher.addWorker(worker);
 			worker.on('exit', function () {
 				startWorker();
+			});
+			worker.on('message', function(event) {
+				publisher.triggerEventUp(event.type, event.data);
 			});
 		};
 		startWorker();
@@ -38,8 +41,8 @@ if (!argv.slave) {
 
 } else {
 	var socketPort = argv['socket-port'],
-		worker = new socketRedis.Worker(socketPort);
-	process.on('message', function (message) {
-		worker.publish(message.channel, message.data);
+		worker = new socketRedis.Worker(socketPort, redisHost);
+	process.on('message', function (event) {
+		worker.triggerEventDown(event.type, event.data);
 	});
 }
