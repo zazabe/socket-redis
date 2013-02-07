@@ -13,10 +13,10 @@ When specifying multiple `--socket-ports` the script will spawn a child process 
 ### Messages published to redis pub/sub channel `socket-redis-up`:
 - `{type: "subscribe", data: {channel: <channel>, clientKey: <clientKey>, data: <subscribe-data>}`
 - `{type: "unsubscribe", data: {channel: <channel>, clientKey: <clientKey>}`
-- `{type: "message", data: {channel: <channel>, data: <data>}`
+- `{type: "message", data: {data: <data>}`
 
 ### Messages which are detected on redis pub/sub channel `socket-redis-down`:
-- `{type: "message", data: {data: <data>}`
+- `{type: "message", data: {channel: <channel>, data: <data>}`
 
 
 ## Installation
