@@ -59,6 +59,9 @@ var SocketRedis = (function() {
 	 * @param {String} channel
 	 */
 	Client.prototype.unsubscribe = function(channel) {
+		if (onMessageCallbacks[channel]) {
+			delete onMessageCallbacks[channel];
+		}
 		sockJS.send(JSON.stringify({event: 'unsubscribe', channel: channel}));
 	};
 
