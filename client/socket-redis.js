@@ -6,66 +6,73 @@ var SocketRedis = (function() {
 	var sockJS;
 
 	/**
-	 * @param {String} host
-	 * @param {Integer} port
-	 * @param {String[]} [protocols]
+	 * @type {Object}
+	 */
+	var onMessageCallbacks = {};
+
+	/**
+	 * @param {String} url
 	 * @constructor
 	 */
-	function Client(host, port, protocols) {
+	function Client(url) {
 		var handler = this;
-		retryDelayed(0.1, 5, function(retry, resetDelay) {
-			// TODO: Removing iframe-htmlfile transport because of https://github.com/sockjs/sockjs-client/issues/90
-			protocols = protocols || ['websocket', 'xdr-streaming', 'xhr-streaming', 'iframe-eventsource', 'xdr-polling', 'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling'];
-			sockJS = new SockJS('http://' + host + ':' + port + '/stream', null, { protocols_whitelist: protocols });
-
+		retryDelayed(100, 5000, function(retry, resetDelay) {
+			sockJS = new SockJS(url);
 			sockJS.onopen = function() {
 				resetDelay();
-				handler.onConnect.call(handler)
+				handler.onopen.call(handler)
 			};
 			sockJS.onmessage = function(event) {
-				handler.onMessage.call(handler, event);
+				var data = JSON.parse(event.data);
+				if (onMessageCallbacks[data.channel]) {
+					onMessageCallbacks[data.channel].call(handler, data.data);
+				}
 			};
 			sockJS.onclose = function() {
 				retry();
-				handler.onDisconnect.call(handler);
+				handler.onclose.call(handler);
 			};
 		});
+
+		// https://github.com/sockjs/sockjs-client/issues/18
+		if (window.addEventListener) {
+			window.addEventListener('keydown', function(event) {
+				if (event.keyCode == 27) {
+					event.preventDefault();
+				}
+			})
+		}
 	}
 
 	/**
 	 * @param {String} channel
 	 * @param {Integer} [start]
 	 * @param {Object} [data]
+	 * @param {Function} [onmessage] fn(data)
 	 */
-	Client.prototype.subscribe = function (channel, start, data) {
+	Client.prototype.subscribe = function(channel, start, data, onmessage) {
 		sockJS.send(JSON.stringify({event: 'subscribe', channel: channel, start: start, data: data}));
+		onMessageCallbacks[channel] = onmessage;
 	};
 
 	/**
 	 * @param {String} channel
 	 */
-	Client.prototype.unsubscribe = function (channel) {
-		sockJS.send(JSON.stringify({event: 'unsubscribe', channel: channel, start: start, data: data}));
+	Client.prototype.unsubscribe = function(channel) {
+		sockJS.send(JSON.stringify({event: 'unsubscribe', channel: channel}));
 	};
 
 	/**
-	 * @param {String} channel
 	 * @param {Object} data
 	 */
-	Client.prototype.message = function (channel, data) {
-		sockJS.send(JSON.stringify({event: 'message', channel: channel , data: data}));
+	Client.prototype.send = function(data) {
+		sockJS.send(JSON.stringify({event: 'message', data: data}));
 	};
 
-	Client.prototype.onConnect = function () {
+	Client.prototype.onopen = function() {
 	};
 
-	Client.prototype.onDisconnect = function () {
-	};
-
-	/**
-	 * @param {Object} event
-	 */
-	Client.prototype.onMessage = function(event) {
+	Client.prototype.onclose = function() {
 	};
 
 	/**
@@ -74,8 +81,6 @@ var SocketRedis = (function() {
 	 * @param {Function} execution fn({Function} retry, {Function} resetDelay)
 	 */
 	var retryDelayed = function(delayMin, delayMax, execution) {
-		delayMin *= 1000;
-		delayMax *= 1000;
 		var delay = delayMin;
 		var timeout;
 		var resetDelay = function() {
