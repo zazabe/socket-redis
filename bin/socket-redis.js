@@ -5,7 +5,6 @@ var socketRedis = require('../socket-redis.js'),
 	optimist = require('optimist').default('log-dir', null),
 	argv = optimist.default('redis-host', 'localhost').argv,
 	redisHost = argv['redis-host'],
-	statusPort = argv['status-port'],
 	logDir = argv['log-dir'];
 
 if (logDir) {

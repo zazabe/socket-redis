@@ -21,9 +21,11 @@ You can run socket-redis using default arguments or specify them on your own.
 
 `--redis-host` Specify host of redis server. Defaults to `localhost`.
 
-`--socket-ports` Comma separated ports which SockJS workers will listen on. Defaults to `8090`.
+`--socket-ports` Comma separated public ports which SockJS workers will listen on. Defaults to `8090`.
 
 `--log-dir` Directory where log is stored. Script will try to create directory if needed. Defaults to `null` which means it will output to stdout.
+
+`--status-port` Specify port for http status requests. It should not be publicly accesible. Defaults to `8086`
 
 ### Messages published to redis pub/sub channel `socket-redis-up`:
 - `{type: "subscribe", data: {channel: <channel>, clientKey: <clientKey>, data: <subscribe-data>}}`
@@ -33,6 +35,8 @@ You can run socket-redis using default arguments or specify them on your own.
 ### Messages which are detected on redis pub/sub channel `socket-redis-down`:
 - `{type: "message", data: {channel: <channel>, data: <data>}}`
 
+### Status request
+Server also answers http requests (on port 8086 by default). You can request on-demand state of all subscribers grouped by channels.
 
 ## Client
 
