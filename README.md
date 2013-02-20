@@ -38,6 +38,20 @@ You can run socket-redis using default arguments or specify them on your own.
 ### Status request
 Server also answers http requests (on port 8086 by default). You can request on-demand state of all subscribers grouped by channels.
 
+Status response schema:
+
+```javascript
+{<channel-name>: {
+	"subscribers": {
+		<client-key>: {
+			clientKey: <client-key>,
+			subscribeStamp: <subscribe-stamp>,
+			data: {}
+		}
+	}
+}
+```
+
 ## Client
 
 ### Installation
