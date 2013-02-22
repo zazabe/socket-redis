@@ -41,12 +41,12 @@ Server also answers http requests (on port 8086 by default). You can request on-
 Status response schema:
 
 ```javascript
-{<channel-name>: {
+{<channel>: {
 	"subscribers": {
-		<client-key>: {
-			clientKey: <client-key>,
-			subscribeStamp: <subscribe-stamp>,
-			data: {}
+		<clientKey>: {
+			"clientKey": <clientKey>,
+			"subscribeStamp": <subscribe-stamp>,
+			"data": {}
 		}
 	}
 }
