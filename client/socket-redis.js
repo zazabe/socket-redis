@@ -57,7 +57,7 @@ var SocketRedis = (function() {
 		if (subscribes[channel]) {
 			throw 'Channel `' + channel + '` is already subscribed';
 		}
-		subscribes[channel] = {event: {event: 'subscribe', channel: channel, start: start, data: data}, callback: onmessage};
+		subscribes[channel] = {event: {channel: channel, data: data}, callback: onmessage};
 		if (sockJS.readyState === SockJS.OPEN) {
 			subscribe(channel);
 		}
@@ -70,7 +70,9 @@ var SocketRedis = (function() {
 		if (subscribes[channel]) {
 			delete subscribes[channel];
 		}
-		sockJS.send(JSON.stringify({event: 'unsubscribe', channel: channel}));
+		if (sockJS.readyState === SockJS.OPEN) {
+			sockJS.send(JSON.stringify({event: 'unsubscribe', channel: channel}));
+		}
 	};
 
 	/**
@@ -91,7 +93,7 @@ var SocketRedis = (function() {
 	 */
 	var subscribe = function(channel) {
 		var event = subscribes[channel].event;
-		sockJS.send(JSON.stringify(event));
+		sockJS.send(JSON.stringify({event: 'subscribe', channel: event.channel, data: event.data, start: new Date().getTime()}));
 	};
 
 	/**
