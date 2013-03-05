@@ -8,7 +8,7 @@ var SocketRedis = (function() {
 	/**
 	 * @type {Object}
 	 */
-	var onMessageCallbacks = {};
+	var subscribes = {};
 
 	/**
 	 * @param {String} url
@@ -20,12 +20,15 @@ var SocketRedis = (function() {
 			sockJS = new SockJS(url);
 			sockJS.onopen = function() {
 				resetDelay();
+				_.each(subscribes, function(data, channel) {
+					subscribe(channel);
+				});
 				handler.onopen.call(handler)
 			};
 			sockJS.onmessage = function(event) {
 				var data = JSON.parse(event.data);
-				if (onMessageCallbacks[data.channel]) {
-					onMessageCallbacks[data.channel].call(handler, data.data);
+				if (subscribes[data.channel]) {
+					subscribes[data.channel].callback.call(handler, data.data);
 				}
 			};
 			sockJS.onclose = function() {
@@ -51,16 +54,18 @@ var SocketRedis = (function() {
 	 * @param {Function} [onmessage] fn(data)
 	 */
 	Client.prototype.subscribe = function(channel, start, data, onmessage) {
-		sockJS.send(JSON.stringify({event: 'subscribe', channel: channel, start: start, data: data}));
-		onMessageCallbacks[channel] = onmessage;
+		subscribes[channel] = {event: {event: 'subscribe', channel: channel, start: start, data: data}, callback: onmessage};
+		if (sockJS.readyState === SockJS.OPEN) {
+			subscribe(channel);
+		}
 	};
 
 	/**
 	 * @param {String} channel
 	 */
 	Client.prototype.unsubscribe = function(channel) {
-		if (onMessageCallbacks[channel]) {
-			delete onMessageCallbacks[channel];
+		if (subscribes[channel]) {
+			delete subscribes[channel];
 		}
 		sockJS.send(JSON.stringify({event: 'unsubscribe', channel: channel}));
 	};
@@ -76,6 +81,14 @@ var SocketRedis = (function() {
 	};
 
 	Client.prototype.onclose = function() {
+	};
+
+	/**
+	 * @param {String} channel
+	 */
+	var subscribe = function(channel) {
+		var event = subscribes[channels].event;
+		sockJS.send(JSON.stringify(event));
 	};
 
 	/**
