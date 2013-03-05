@@ -90,7 +90,7 @@ var SocketRedis = (function() {
 	 * @param {String} channel
 	 */
 	var subscribe = function(channel) {
-		var event = subscribes[channels].event;
+		var event = subscribes[channel].event;
 		sockJS.send(JSON.stringify(event));
 	};
 
