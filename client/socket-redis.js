@@ -54,6 +54,9 @@ var SocketRedis = (function() {
 	 * @param {Function} [onmessage] fn(data)
 	 */
 	Client.prototype.subscribe = function(channel, start, data, onmessage) {
+		if (subscribes[channel]) {
+			throw 'Channel `' + channel + '` is already subscribed';
+		}
 		subscribes[channel] = {event: {event: 'subscribe', channel: channel, start: start, data: data}, callback: onmessage};
 		if (sockJS.readyState === SockJS.OPEN) {
 			subscribe(channel);
