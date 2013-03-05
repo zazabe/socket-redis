@@ -1,3 +1,6 @@
+/**
+ * @class SocketRedis
+ */
 var SocketRedis = (function() {
 
 	/**
