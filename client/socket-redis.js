@@ -49,11 +49,10 @@ var SocketRedis = (function() {
 
 	/**
 	 * @param {String} channel
-	 * @param {Integer} [start]
 	 * @param {Object} [data]
 	 * @param {Function} [onmessage] fn(data)
 	 */
-	Client.prototype.subscribe = function(channel, start, data, onmessage) {
+	Client.prototype.subscribe = function(channel, data, onmessage) {
 		if (subscribes[channel]) {
 			throw 'Channel `' + channel + '` is already subscribed';
 		}
