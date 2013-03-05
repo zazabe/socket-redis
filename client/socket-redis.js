@@ -14,6 +14,11 @@ var SocketRedis = (function() {
 	var subscribes = {};
 
 	/**
+	 * @type {Integer|Null}
+	 */
+	var closeStamp = null;
+
+	/**
 	 * @param {String} url
 	 * @constructor
 	 */
@@ -24,8 +29,9 @@ var SocketRedis = (function() {
 			sockJS.onopen = function() {
 				resetDelay();
 				_.each(subscribes, function(data, channel) {
-					subscribe(channel);
+					subscribe(channel, closeStamp);
 				});
+				closeStamp = null;
 				handler.onopen.call(handler)
 			};
 			sockJS.onmessage = function(event) {
@@ -35,6 +41,7 @@ var SocketRedis = (function() {
 				}
 			};
 			sockJS.onclose = function() {
+				closeStamp = new Date().getTime();
 				retry();
 				handler.onclose.call(handler);
 			};
@@ -52,14 +59,15 @@ var SocketRedis = (function() {
 
 	/**
 	 * @param {String} channel
+	 * @param {Integer} start
 	 * @param {Object} [data]
 	 * @param {Function} [onmessage] fn(data)
 	 */
-	Client.prototype.subscribe = function(channel, data, onmessage) {
+	Client.prototype.subscribe = function(channel, start, data, onmessage) {
 		if (subscribes[channel]) {
 			throw 'Channel `' + channel + '` is already subscribed';
 		}
-		subscribes[channel] = {event: {channel: channel, data: data}, callback: onmessage};
+		subscribes[channel] = {event: {channel: channel, start: start, data: data}, callback: onmessage};
 		if (sockJS.readyState === SockJS.OPEN) {
 			subscribe(channel);
 		}
@@ -92,10 +100,14 @@ var SocketRedis = (function() {
 
 	/**
 	 * @param {String} channel
+	 * @param {Integer} [startStamp]
 	 */
-	var subscribe = function(channel) {
+	var subscribe = function(channel, startStamp) {
 		var event = subscribes[channel].event;
-		sockJS.send(JSON.stringify({event: 'subscribe', channel: event.channel, data: event.data, start: new Date().getTime()}));
+		if (!startStamp) {
+			startStamp = event.start || new Date().getTime();
+		}
+		sockJS.send(JSON.stringify({event: 'subscribe', channel: event.channel, data: event.data, start: startStamp}));
 	};
 
 	/**
