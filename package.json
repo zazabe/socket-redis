@@ -1,6 +1,6 @@
 {
 	"name": "socket-redis",
-	"version": "0.0.16",
+	"version": "0.0.17",
 	"description": "Redis to SockJS relay",
 	"main": "socket-redis.js",
 	"bin": {
@@ -19,6 +19,7 @@
 		"underscore": "1.4.4",
 		"sockjs": "0.3.5",
 		"redis": "0.8.2",
-		"optimist": "0.3.4"
+		"optimist": "0.3.4",
+		"log4js": "0.5.7"
 	}
 }
