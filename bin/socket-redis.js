@@ -1,20 +1,14 @@
 #!/usr/bin/env node
 var socketRedis = require('../socket-redis.js'),
 	childProcess = require('child_process'),
+	utils = require('../lib/utils.js'),
 	optimist = require('optimist').default('log-dir', null),
 	argv = optimist.default('redis-host', 'localhost').argv,
 	redisHost = argv['redis-host'],
-	logDir = argv['log-dir'],
-	log4js = require('log4js');
+	logDir = argv['log-dir'];
 
 if (logDir) {
-	log4js.clearAppenders();
-	log4js.loadAppender('file');
-	log4js.addAppender(log4js.appenders.file(logDir + '/socket-redis.log'));
-	var logger = log4js.getLogger();
-	process.stdout.write = function(content) { return logger.debug(content); };
-	process.stderr.write = function(content) { return logger.error(content); };
-	process.on('uncaughtException', function(e) { process.stderr.write('Uncaught exception: ' + e + '\n' + e.stack + '\n'); });
+	utils.logProcessInto(process, logDir + '/socket-redis.log');
 }
 
 if (!process.send) {
