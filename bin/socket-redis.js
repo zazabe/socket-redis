@@ -3,9 +3,14 @@ var socketRedis = require('../socket-redis.js'),
 	childProcess = require('child_process'),
 	utils = require('../lib/utils.js'),
 	optimist = require('optimist').default('log-dir', null),
+	fs = require('fs'),
 	argv = optimist.default('redis-host', 'localhost').argv,
 	redisHost = argv['redis-host'],
-	logDir = argv['log-dir'];
+	logDir = argv['log-dir'],
+	sslKey = argv['ssl-key'],
+	sslCert = argv['ssl-cert'],
+	sslPfx = argv['ssl-pfx'];
+
 
 if (logDir) {
 	utils.logProcessInto(process, logDir + '/socket-redis.log');
@@ -20,6 +25,12 @@ if (!process.send) {
 		var args = ['--socket-port=' + socketPort];
 		if (logDir) {
 			args.push('--log-dir=' + logDir);
+		}
+		if (sslKey && sslCert) {
+			args.push('--ssl-key=' + sslKey, '--ssl-cert=' + sslCert);
+		}
+		if (sslPfx) {
+			args.push('--ssl-pfx=' + sslPfx);
 		}
 		var startWorker = function () {
 			var worker = childProcess.fork(__filename, args);
@@ -40,8 +51,20 @@ if (!process.send) {
 	});
 
 } else {
+	var sslOptions = null;
+	if (sslKey && sslCert) {
+		sslOptions = {
+			key: fs.readFileSync(sslKey),
+			cert: fs.readFileSync(sslCert)
+		};
+	}
+	if (sslPfx) {
+		sslOptions = {
+			pfx: fs.readFileSync(sslPfx)
+		};
+	}
 	var socketPort = argv['socket-port'],
-		worker = new socketRedis.Worker(socketPort, redisHost);
+		worker = new socketRedis.Worker(socketPort, sslOptions);
 	process.on('message', function (event) {
 		worker.triggerEventDown(event.type, event.data);
 	});
