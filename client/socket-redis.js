@@ -28,9 +28,11 @@ var SocketRedis = (function() {
 			sockJS = new SockJS(url);
 			sockJS.onopen = function() {
 				resetDelay();
-				_.each(subscribes, function(data, channel) {
-					subscribe(channel, closeStamp);
-				});
+				for (var channel in subscribes) {
+					if (subscribes.hasOwnProperty(channel)) {
+						subscribe(channel, closeStamp);
+					}
+				}
 				closeStamp = null;
 				handler.onopen.call(handler)
 			};
