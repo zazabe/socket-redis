@@ -17,7 +17,7 @@ npm install socket-redis [-g]
 
 
 ### Running
-You can run socket-redis using default arguments or specify them on your own. 
+You can run socket-redis using default arguments or specify them on your own.
 
 `--redis-host` Specify host of redis server. Defaults to `localhost`.
 
@@ -26,6 +26,13 @@ You can run socket-redis using default arguments or specify them on your own.
 `--log-dir` Directory where log is stored. Script will try to create directory if needed. Defaults to `null` which means it will output to stdout.
 
 `--status-port` Specify port for http status requests. It should not be publicly accesible. Defaults to `8086`
+
+`--ssl-key` Specify ssl key file. Combine with `ssl-cert` option.
+
+`--ssl-cert` Specify ssl certificate file. Combine with `ssl-key` option.
+
+`--ssl-pfx` Specify ssl pfx file. Overrides `ssl-key` and `ssl-cert` options.
+
 
 ### Messages published to redis pub/sub channel `socket-redis-up`:
 - `{type: "subscribe", data: {channel: <channel>, clientKey: <clientKey>, data: <subscribe-data>}}`
@@ -60,7 +67,7 @@ Include the SockJS and socket-redis client libraries in your html file:
 <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
 <script src="https://raw.github.com/cargomedia/socket-redis/master/client/socket-redis.js"></script>
 ```
-  
+
 ### Example
 To receive messages from the server create a new `SocketRedis` instance and subsribe to some channels:
 ```
