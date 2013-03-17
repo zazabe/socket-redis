@@ -61,7 +61,7 @@ var SocketRedis = (function() {
 
 	/**
 	 * @param {String} channel
-	 * @param {Integer} start
+	 * @param {Number} [start]
 	 * @param {Object} [data]
 	 * @param {Function} [onmessage] fn(data)
 	 */
