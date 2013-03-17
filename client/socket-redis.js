@@ -102,7 +102,7 @@ var SocketRedis = (function() {
 
 	/**
 	 * @param {String} channel
-	 * @param {Integer} [startStamp]
+	 * @param {Number} [startStamp]
 	 */
 	var subscribe = function(channel, startStamp) {
 		var event = subscribes[channel].event;
