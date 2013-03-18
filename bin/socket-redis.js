@@ -17,7 +17,7 @@ if (logDir) {
 }
 
 if (!process.send) {
-	argv = optimist.default('socket-ports', '8090').default('status-port', '8086').argv;
+	argv = optimist.default('socket-ports', '8090').default('status-port', '8085').argv;
 	var socketPorts = String(argv['socket-ports']).split(','),
 		publisher = new socketRedis.Server(redisHost, argv['status-port']);
 
