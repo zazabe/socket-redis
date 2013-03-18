@@ -25,7 +25,7 @@ You can run socket-redis using default arguments or specify them on your own.
 
 `--log-dir` Directory where log is stored. Script will try to create directory if needed. Defaults to `null` which means it will output to stdout.
 
-`--status-port` Specify port for http status requests. It should not be publicly accesible. Defaults to `8086`
+`--status-port` Specify port for http status requests. It should not be publicly accesible. Defaults to `8085`
 
 `--ssl-key` Specify ssl key file. Combine with `ssl-cert` option.
 
@@ -43,7 +43,7 @@ You can run socket-redis using default arguments or specify them on your own.
 - `{type: "message", data: {channel: <channel>, data: <data>}}`
 
 ### Status request
-Server also answers http requests (on port 8086 by default). You can request on-demand state of all subscribers grouped by channels.
+Server also answers http requests (on port 8085 by default). You can request on-demand state of all subscribers grouped by channels.
 
 Status response schema:
 
