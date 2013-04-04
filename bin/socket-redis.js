@@ -9,7 +9,8 @@ var socketRedis = require('../socket-redis.js'),
 	logDir = argv['log-dir'],
 	sslKey = argv['ssl-key'],
 	sslCert = argv['ssl-cert'],
-	sslPfx = argv['ssl-pfx'];
+	sslPfx = argv['ssl-pfx'],
+	sslPassphrase = argv['ssl-passphrase'];
 
 
 if (logDir) {
@@ -26,11 +27,17 @@ if (!process.send) {
 		if (logDir) {
 			args.push('--log-dir=' + logDir);
 		}
-		if (sslKey && sslCert) {
-			args.push('--ssl-key=' + sslKey, '--ssl-cert=' + sslCert);
+		if (sslKey) {
+			args.push('--ssl-key=' + sslKey);
+		}
+		if (sslCert) {
+			args.push('--ssl-cert=' + sslCert);
 		}
 		if (sslPfx) {
 			args.push('--ssl-pfx=' + sslPfx);
+		}
+		if (sslPassphrase) {
+			args.push('--ssl-passphrase=' + sslPassphrase);
 		}
 		var startWorker = function () {
 			var worker = childProcess.fork(__filename, args);
@@ -62,6 +69,9 @@ if (!process.send) {
 		sslOptions = {
 			pfx: fs.readFileSync(sslPfx)
 		};
+	}
+	if (sslOptions && sslPassphrase) {
+		sslOptions.passphrase = fs.readFileSync(sslPassphrase).toString().trim();
 	}
 	var socketPort = argv['socket-port'],
 		worker = new socketRedis.Worker(socketPort, sslOptions);
