@@ -27,11 +27,13 @@ You can run socket-redis using default arguments or specify them on your own.
 
 `--status-port` Specify port for http status requests. It should not be publicly accesible. Defaults to `8085`
 
-`--ssl-key` Specify ssl key file. Combine with `ssl-cert` option.
+`--ssl-key` Specify ssl private key file. Combine with `ssl-cert` option.
 
-`--ssl-cert` Specify ssl certificate file. Combine with `ssl-key` option.
+`--ssl-cert` Specify ssl public certificate file. Combine with `ssl-key` option.
 
-`--ssl-pfx` Specify ssl pfx file. Overrides `ssl-key` and `ssl-cert` options.
+`--ssl-pfx` Specify ssl pfx file (key + cert). Overrides `ssl-key` and `ssl-cert` options.
+
+`--ssl-passphrase` Specify file containing the ssl passphrase.
 
 
 ### Messages published to redis pub/sub channel `socket-redis-up`:
