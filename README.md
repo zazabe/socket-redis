@@ -35,6 +35,8 @@ You can run socket-redis using default arguments or specify them on your own.
 
 `--ssl-passphrase` Specify file containing the ssl passphrase.
 
+`--ssl-chain` Specify ssl certificate chain file. Can contain multiple certificates.
+
 
 ### Messages published to redis pub/sub channel `socket-redis-up`:
 - `{type: "subscribe", data: {channel: <channel>, clientKey: <clientKey>, data: <subscribe-data>}}`

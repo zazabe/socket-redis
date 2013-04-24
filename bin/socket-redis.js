@@ -4,13 +4,15 @@ var socketRedis = require('../socket-redis.js'),
 	utils = require('../lib/utils.js'),
 	optimist = require('optimist').default('log-dir', null),
 	fs = require('fs'),
+	_ = require('underscore'),
 	argv = optimist.default('redis-host', 'localhost').argv,
 	redisHost = argv['redis-host'],
 	logDir = argv['log-dir'],
 	sslKey = argv['ssl-key'],
 	sslCert = argv['ssl-cert'],
 	sslPfx = argv['ssl-pfx'],
-	sslPassphrase = argv['ssl-passphrase'];
+	sslPassphrase = argv['ssl-passphrase'],
+	sslChain = argv['ssl-chain'];
 
 
 if (logDir) {
@@ -38,6 +40,9 @@ if (!process.send) {
 		}
 		if (sslPassphrase) {
 			args.push('--ssl-passphrase=' + sslPassphrase);
+		}
+		if (sslChain) {
+			args.push('--ssl-chain=' + sslChain);
 		}
 		var startWorker = function () {
 			var worker = childProcess.fork(__filename, args);
@@ -72,6 +77,20 @@ if (!process.send) {
 	}
 	if (sslOptions && sslPassphrase) {
 		sslOptions.passphrase = fs.readFileSync(sslPassphrase).toString().trim();
+	}
+	if (sslOptions && sslChain) {
+		// Source: http://www.benjiegillam.com/2012/06/node-dot-js-ssl-certificate-chain/
+		sslOptions.ca = [];
+		var cert = [];
+		_.each(fs.readFileSync(sslChain).toString().split("\n"), function(line) {
+			if (line.length > 0) {
+				cert.push(line);
+				if (line.match(/-END CERTIFICATE-/)) {
+					sslOptions.ca.push(cert.join("\n"));
+					cert = [];
+				}
+			}
+		});
 	}
 	var socketPort = argv['socket-port'],
 		worker = new socketRedis.Worker(socketPort, sslOptions);
