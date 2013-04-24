@@ -4,15 +4,13 @@ var socketRedis = require('../socket-redis.js'),
 	utils = require('../lib/utils.js'),
 	optimist = require('optimist').default('log-dir', null),
 	fs = require('fs'),
-	_ = require('underscore'),
 	argv = optimist.default('redis-host', 'localhost').argv,
 	redisHost = argv['redis-host'],
 	logDir = argv['log-dir'],
 	sslKey = argv['ssl-key'],
 	sslCert = argv['ssl-cert'],
 	sslPfx = argv['ssl-pfx'],
-	sslPassphrase = argv['ssl-passphrase'],
-	sslChain = argv['ssl-chain'];
+	sslPassphrase = argv['ssl-passphrase'];
 
 
 if (logDir) {
@@ -41,9 +39,6 @@ if (!process.send) {
 		if (sslPassphrase) {
 			args.push('--ssl-passphrase=' + sslPassphrase);
 		}
-		if (sslChain) {
-			args.push('--ssl-chain=' + sslChain);
-		}
 		var startWorker = function () {
 			var worker = childProcess.fork(__filename, args);
 			publisher.addWorker(worker);
@@ -66,9 +61,19 @@ if (!process.send) {
 	var sslOptions = null;
 	if (sslKey && sslCert) {
 		sslOptions = {
-			key: fs.readFileSync(sslKey),
-			cert: fs.readFileSync(sslCert)
+			key: fs.readFileSync(sslKey)
 		};
+
+		var certFile = fs.readFileSync(sslCert).toString();
+		var certs = certFile.match(/(-+BEGIN CERTIFICATE-+[\s\S]+?-+END CERTIFICATE-+)/g);
+		if (!certs || !certs.length) {
+			sslOptions.cert = certFile;
+		} else {
+			sslOptions.cert = certs.shift();
+			if (certs.length) {
+				sslOptions.ca = certs;
+			}
+		}
 	}
 	if (sslPfx) {
 		sslOptions = {
@@ -77,20 +82,6 @@ if (!process.send) {
 	}
 	if (sslOptions && sslPassphrase) {
 		sslOptions.passphrase = fs.readFileSync(sslPassphrase).toString().trim();
-	}
-	if (sslOptions && sslChain) {
-		// Source: http://www.benjiegillam.com/2012/06/node-dot-js-ssl-certificate-chain/
-		sslOptions.ca = [];
-		var cert = [];
-		_.each(fs.readFileSync(sslChain).toString().split("\n"), function(line) {
-			if (line.length > 0) {
-				cert.push(line);
-				if (line.match(/-END CERTIFICATE-/)) {
-					sslOptions.ca.push(cert.join("\n"));
-					cert = [];
-				}
-			}
-		});
 	}
 	var socketPort = argv['socket-port'],
 		worker = new socketRedis.Worker(socketPort, sslOptions);
