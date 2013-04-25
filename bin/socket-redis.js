@@ -7,6 +7,7 @@ var socketRedis = require('../socket-redis.js'),
 	argv = optimist.default('redis-host', 'localhost').argv,
 	redisHost = argv['redis-host'],
 	logDir = argv['log-dir'],
+	sockjsClientUrl = argv['sockjs-client-url'],
 	sslKey = argv['ssl-key'],
 	sslCert = argv['ssl-cert'],
 	sslPfx = argv['ssl-pfx'],
@@ -26,6 +27,9 @@ if (!process.send) {
 		var args = ['--socket-port=' + socketPort];
 		if (logDir) {
 			args.push('--log-dir=' + logDir);
+		}
+		if (sockjsClientUrl) {
+			args.push('--sockjs-client-url=' + sockjsClientUrl);
 		}
 		if (sslKey) {
 			args.push('--ssl-key=' + sslKey);
@@ -84,7 +88,7 @@ if (!process.send) {
 		sslOptions.passphrase = fs.readFileSync(sslPassphrase).toString().trim();
 	}
 	var socketPort = argv['socket-port'],
-		worker = new socketRedis.Worker(socketPort, sslOptions);
+		worker = new socketRedis.Worker(socketPort, sockjsClientUrl, sslOptions);
 	process.on('message', function (event) {
 		worker.triggerEventDown(event.type, event.data);
 	});
