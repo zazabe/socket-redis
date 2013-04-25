@@ -66,7 +66,7 @@ if (!process.send) {
 
 		var certFile = fs.readFileSync(sslCert).toString();
 		var certs = certFile.match(/(-+BEGIN CERTIFICATE-+[\s\S]+?-+END CERTIFICATE-+)/g);
-		if (certs) {
+		if (certs && certs.length) {
 			sslOptions.cert = certs.shift();
 			if (certs.length) {
 				sslOptions.ca = certs;
