@@ -25,6 +25,8 @@ You can run socket-redis using default arguments or specify them on your own.
 
 `--log-dir` Directory where log is stored. Script will try to create directory if needed. Defaults to `null` which means it will output to stdout.
 
+`--sockjs-client-url` Specify custom url for sockjs-client library.
+
 `--status-port` Specify port for http status requests. It should not be publicly accesible. Defaults to `8085`
 
 `--ssl-key` Specify ssl private key file. Combine with `ssl-cert` option.
