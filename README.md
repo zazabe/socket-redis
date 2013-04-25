@@ -29,7 +29,7 @@ You can run socket-redis using default arguments or specify them on your own.
 
 `--ssl-key` Specify ssl private key file. Combine with `ssl-cert` option.
 
-`--ssl-cert` Specify ssl public certificate file. Combine with `ssl-key` option.
+`--ssl-cert` Specify ssl public certificate file. Combine with `ssl-key` option. Append CA-chain within this file.
 
 `--ssl-pfx` Specify ssl pfx file (key + cert). Overrides `ssl-key` and `ssl-cert` options.
 

@@ -61,9 +61,19 @@ if (!process.send) {
 	var sslOptions = null;
 	if (sslKey && sslCert) {
 		sslOptions = {
-			key: fs.readFileSync(sslKey),
-			cert: fs.readFileSync(sslCert)
+			key: fs.readFileSync(sslKey)
 		};
+
+		var certFile = fs.readFileSync(sslCert).toString();
+		var certs = certFile.match(/(-+BEGIN CERTIFICATE-+[\s\S]+?-+END CERTIFICATE-+)/g);
+		if (certs && certs.length) {
+			sslOptions.cert = certs.shift();
+			if (certs.length) {
+				sslOptions.ca = certs;
+			}
+		} else {
+			sslOptions.cert = certFile;
+		}
 	}
 	if (sslPfx) {
 		sslOptions = {
