@@ -1,4 +1,4 @@
-# socket-redis
+# socket-redis [![Dependencies](https://david-dm.org/cargomedia/socket-redis.png)](https://david-dm.org/cargomedia/socket-redis)
 
 ## About
 "socket-redis" starts a WebSocket emulation server ([SockJS](http://sockjs.org/)) where clients can connect to, and subscribe to multiple channels.
