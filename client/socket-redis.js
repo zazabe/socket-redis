@@ -83,7 +83,7 @@ var SocketRedis = (function() {
 			delete subscribes[channel];
 		}
 		if (sockJS.readyState === SockJS.OPEN) {
-			sockJS.send(JSON.stringify({event: 'unsubscribe', channel: channel}));
+			sockJS.send(JSON.stringify({event: 'unsubscribe', data: {channel: channel}}));
 		}
 	};
 
@@ -91,7 +91,7 @@ var SocketRedis = (function() {
 	 * @param {Object} data
 	 */
 	Client.prototype.send = function(data) {
-		sockJS.send(JSON.stringify({event: 'message', data: data}));
+		sockJS.send(JSON.stringify({event: 'message', data: {data: data}}));
 	};
 
 	/**
@@ -118,7 +118,7 @@ var SocketRedis = (function() {
 		if (!startStamp) {
 			startStamp = event.start || new Date().getTime();
 		}
-		sockJS.send(JSON.stringify({event: 'subscribe', channel: event.channel, data: event.data, start: startStamp}));
+		sockJS.send(JSON.stringify({event: 'subscribe', data: {channel: event.channel, data: event.data, start: startStamp}}));
 	};
 
 	/**
