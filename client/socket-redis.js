@@ -14,7 +14,7 @@ var SocketRedis = (function() {
 	var subscribes = {};
 
 	/**
-	 * @type {Integer|Null}
+	 * @type {Number|Null}
 	 */
 	var closeStamp = null;
 
@@ -39,7 +39,7 @@ var SocketRedis = (function() {
 			sockJS.onmessage = function(event) {
 				var data = JSON.parse(event.data);
 				if (subscribes[data.channel]) {
-					subscribes[data.channel].callback.call(handler, data.data);
+					subscribes[data.channel].callback.call(handler, data.event, data.data);
 				}
 			};
 			sockJS.onclose = function() {

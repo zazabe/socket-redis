@@ -44,7 +44,7 @@ You can run socket-redis using default arguments or specify them on your own.
 - `{type: "message", data: {clientKey: <clientKey>, data: <data>}}`
 
 ### Messages which are detected on redis pub/sub channel `socket-redis-down`:
-- `{type: "message", data: {channel: <channel>, data: <data>}}`
+- `{type: "publish", data: {channel: <channel>, event: <event>, data: <data>}}`
 
 ### Status request
 Server also answers http requests (on port 8085 by default). You can request on-demand state of all subscribers grouped by channels.
@@ -77,13 +77,20 @@ To receive messages from the server create a new `SocketRedis` instance and subs
 ```
 var socketRedis = new SocketRedis('http://example.com:8090');
 socketRedis.onopen = function() {
-	socketRedis.subscribe('channel-name', null, {foo: 'bar'}, function(data) {
-		console.log('New message on channel `channel-name`:', data);
+	socketRedis.subscribe('channel-name', null, {foo: 'bar'}, function(event, data) {
+		console.log('New event `' + event + '` on channel `channel-name`:', data);
 	});
 
 	socketRedis.unsubscribe('channel-name');
 };
 ```
+
+To publish messages to a channel from the client:
+```
+socketRedis.publish('foo', {foo: 'bar'});
+```
+(The event name will be prefixed with `client-` and thus become `client-foo`.)
+
 
 To send messages to the server:
 ```
