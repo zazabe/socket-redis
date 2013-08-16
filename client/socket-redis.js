@@ -94,6 +94,15 @@ var SocketRedis = (function() {
 		sockJS.send(JSON.stringify({event: 'message', data: data}));
 	};
 
+	/**
+	 * @param {String} channel
+	 * @param {String} event
+	 * @param {Object} data
+	 */
+	Client.prototype.publish = function(channel, event, data) {
+		sockJS.send(JSON.stringify({event: 'publish', data: {channel: channel, event: event, data: data}}));
+	};
+
 	Client.prototype.onopen = function() {
 	};
 
