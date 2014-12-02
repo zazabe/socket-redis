@@ -16,11 +16,11 @@
 	"author": "Cargomedia",
 	"license": "BSD",
 	"dependencies": {
-		"underscore": "1.7.0",
-		"sockjs": "0.3.11",
-		"redis": "0.8.4",
-		"optimist": "0.6.1",
-		"log4js": "0.6.21",
-		"validator": "3.22.1"
+		"underscore": "~1.7.0",
+		"sockjs": "~0.3.11",
+		"redis": "~0.8.4",
+		"optimist": "~0.6.1",
+		"log4js": "~0.6.21",
+		"validator": "~3.22.1"
 	}
 }
