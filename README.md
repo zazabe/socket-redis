@@ -96,3 +96,10 @@ To send messages to the server:
 ```
 socketRedis.send({foo: 'bar'});
 ```
+
+To send messages from server to client:<br>
+Open redis console `redis-cli` <br>
+
+```
+publish socket-redis-down '{"type":"publish", "data": {"channel":"channel-name", "event":"foo", "data":"hello"}}'
+```
