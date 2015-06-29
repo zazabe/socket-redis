@@ -46,6 +46,11 @@ You can run socket-redis using default arguments or specify them on your own.
 ### Messages which are detected on redis pub/sub channel `socket-redis-down`:
 - `{type: "publish", data: {channel: <channel>, event: <event>, data: <data>}}`
 
+For example you could publish messages using *Redis CLI*:
+```sh
+redis-cli 'publish' 'socket-redis-down' '{"type":"publish", "data": {"channel":"<channel>", "event":"<event>", "data":"<data>"}}'
+```
+
 ### Status request
 Server also answers http requests (on port 8085 by default). You can request on-demand state of all subscribers grouped by channels.
 
@@ -95,11 +100,4 @@ socketRedis.publish('foo', {foo: 'bar'});
 To send messages to the server:
 ```
 socketRedis.send({foo: 'bar'});
-```
-
-To send messages from server to client:<br>
-Open redis console `redis-cli` <br>
-
-```
-publish socket-redis-down '{"type":"publish", "data": {"channel":"channel-name", "event":"foo", "data":"hello"}}'
 ```
