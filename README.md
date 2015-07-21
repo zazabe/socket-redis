@@ -1,13 +1,18 @@
-# socket-redis [![Dependencies](https://david-dm.org/cargomedia/socket-redis.png)](https://david-dm.org/cargomedia/socket-redis)
+socket-redis [![Dependencies](https://david-dm.org/cargomedia/socket-redis.png)](https://david-dm.org/cargomedia/socket-redis)
+============
+*socket-redis* is a WebSocket pub/sub server and client, exposing an API over Redis
+(allowing you to use WebSocket functionality in your application using a Redis client).
 
-## About
-"socket-redis" starts a WebSocket emulation server ([SockJS](http://sockjs.org/)) where clients can connect to, and subscribe to multiple channels.
+About
+-----
+*socket-redis* starts a WebSocket emulation server ([SockJS](http://sockjs.org/)) where clients can connect to, and subscribe to multiple channels.
 The server will let you consume client-related events like `message`, `subscribe` and `unsubscribe` on a [Redis](http://redis.io/) pub/sub channel `socket-redis-up`. Additionally it will subscribe to another pub/sub channel `socket-redis-down` where you can send messages to all clients in a channel.
 
 When specifying multiple `--socket-ports` the script will spawn a child process for each port. This is provided as a simple way to make use of all your CPU cores.
 
 
-## Server
+Server
+------
 
 ### Installation
 Package is in nodejs and is available through npm registry:
@@ -66,7 +71,8 @@ Status response schema:
 }
 ```
 
-## Client
+Client
+------
 
 ### Installation
 Include the SockJS and socket-redis client libraries in your html file:
