@@ -1,13 +1,18 @@
-# socket-redis [![Dependencies](https://david-dm.org/cargomedia/socket-redis.png)](https://david-dm.org/cargomedia/socket-redis)
+socket-redis [![Dependencies](https://david-dm.org/cargomedia/socket-redis.png)](https://david-dm.org/cargomedia/socket-redis)
+============
+*socket-redis* is a WebSocket pub/sub server and client, exposing an API over Redis
+(allowing you to use WebSocket functionality in your application using a Redis client).
 
-## About
-"socket-redis" starts a WebSocket emulation server ([SockJS](http://sockjs.org/)) where clients can connect to, and subscribe to multiple channels.
+About
+-----
+*socket-redis* starts a WebSocket emulation server ([SockJS](http://sockjs.org/)) where clients can connect to, and subscribe to multiple channels.
 The server will let you consume client-related events like `message`, `subscribe` and `unsubscribe` on a [Redis](http://redis.io/) pub/sub channel `socket-redis-up`. Additionally it will subscribe to another pub/sub channel `socket-redis-down` where you can send messages to all clients in a channel.
 
 When specifying multiple `--socket-ports` the script will spawn a child process for each port. This is provided as a simple way to make use of all your CPU cores.
 
 
-## Server
+Server
+------
 
 ### Installation
 Package is in nodejs and is available through npm registry:
@@ -19,23 +24,21 @@ npm install socket-redis [-g]
 ### Running
 You can run socket-redis using default arguments or specify them on your own.
 
-`--redis-host` Specify host of redis server. Defaults to `localhost`.
+Example:
+```sh
+socket-redis --socket-ports=8090,8091,8092
+```
 
-`--socket-ports` Comma separated public ports which SockJS workers will listen on. Defaults to `8090`.
-
-`--log-dir` Directory where log is stored. Script will try to create directory if needed. Defaults to `null` which means it will output to stdout.
-
-`--sockjs-client-url` Specify custom url for sockjs-client library.
-
-`--status-port` Specify port for http status requests. It should not be publicly accesible. Defaults to `8085`
-
-`--ssl-key` Specify ssl private key file. Combine with `ssl-cert` option.
-
-`--ssl-cert` Specify ssl public certificate file. Combine with `ssl-key` option. Append CA-chain within this file.
-
-`--ssl-pfx` Specify ssl pfx file (key + cert). Overrides `ssl-key` and `ssl-cert` options.
-
-`--ssl-passphrase` Specify file containing the ssl passphrase.
+Available options:
+- `--redis-host` Specify host of redis server. Defaults to `localhost`.
+- `--socket-ports` Comma separated public ports which SockJS workers will listen on. Defaults to `8090`.
+- `--log-dir` Directory where log is stored. Script will try to create directory if needed. Defaults to `null` which means it will output to stdout.
+- `--sockjs-client-url` Specify custom url for sockjs-client library.
+- `--status-port` Specify port for http status requests. It should not be publicly accesible. Defaults to `8085`
+- `--ssl-key` Specify ssl private key file. Combine with `ssl-cert` option.
+- `--ssl-cert` Specify ssl public certificate file. Combine with `ssl-key` option. Append CA-chain within this file.
+- `--ssl-pfx` Specify ssl pfx file (key + cert). Overrides `ssl-key` and `ssl-cert` options.
+- `--ssl-passphrase` Specify file containing the ssl passphrase.
 
 
 ### Messages published to redis pub/sub channel `socket-redis-up`:
@@ -68,7 +71,8 @@ Status response schema:
 }
 ```
 
-## Client
+Client
+------
 
 ### Installation
 Include the SockJS and socket-redis client libraries in your html file:
