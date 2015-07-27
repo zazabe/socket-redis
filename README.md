@@ -82,7 +82,7 @@ Include the SockJS and socket-redis client libraries in your html file:
 ```
 
 ### Example
-To receive messages from the server create a new `SocketRedis` instance and subsribe to some channels:
+To receive messages from the server create a new `SocketRedis` instance and subscribe to some channels:
 ```
 var socketRedis = new SocketRedis('http://example.com:8090');
 socketRedis.onopen = function() {
@@ -96,9 +96,9 @@ socketRedis.onopen = function() {
 
 To publish messages to a channel from the client:
 ```
-socketRedis.publish('foo', {foo: 'bar'});
+socketRedis.publish('channel-name', 'event-name', {foo: 'bar'});
 ```
-(The event name will be prefixed with `client-` and thus become `client-foo`.)
+(The event name will be prefixed with `client-` and thus become `client-event-name`.)
 
 
 To send messages to the server:
