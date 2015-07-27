@@ -96,7 +96,7 @@ socketRedis.onopen = function() {
 
 To publish messages to a channel from the client:
 ```
-socketRedis.publish('foo', {foo: 'bar'});
+socketRedis.publish('foo', 'my-event', {foo: 'bar'});
 ```
 (The event name will be prefixed with `client-` and thus become `client-foo`.)
 
