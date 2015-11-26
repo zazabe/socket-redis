@@ -1,26 +1,29 @@
 {
-	"name": "socket-redis",
-	"version": "0.1.4",
-	"description": "Redis to SockJS relay",
-	"main": "socket-redis.js",
-	"bin": {
-		"socket-redis": "./bin/socket-redis.js"
-	},
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"repository": "",
-	"keywords": [
-		"redis", "sockjs", "relay", "bridge"
-	],
-	"author": "Cargomedia",
-	"license": "BSD",
-	"dependencies": {
-		"underscore": "~1.7.0",
-		"sockjs": "~0.3.11",
-		"redis": "~0.12.1",
-		"optimist": "~0.6.1",
-		"log4js": "~0.6.21",
-		"validator": "~3.22.1"
-	}
+  "name": "socket-redis",
+  "version": "0.1.5",
+  "description": "Redis to SockJS relay",
+  "main": "socket-redis.js",
+  "bin": {
+    "socket-redis": "./bin/socket-redis.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "keywords": [
+    "redis",
+    "sockjs",
+    "relay",
+    "bridge"
+  ],
+  "author": "Cargomedia",
+  "license": "BSD",
+  "dependencies": {
+    "underscore": "~1.7.0",
+    "sockjs": "~0.3.11",
+    "redis": "~0.12.1",
+    "optimist": "~0.6.1",
+    "log4js": "~0.6.21",
+    "validator": "~3.22.1"
+  }
 }
