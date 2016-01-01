@@ -1,4 +1,4 @@
-socket-redis [![Dependencies](https://david-dm.org/cargomedia/socket-redis.png)](https://david-dm.org/cargomedia/socket-redis)
+socket-redis [![Version](https://img.shields.io/npm/v/socket-redis.svg)](https://www.npmjs.com/package/socket-redis)
 ============
 *socket-redis* is a WebSocket pub/sub server and client, exposing an API over Redis
 (allowing you to use WebSocket functionality in your application using a Redis client).
