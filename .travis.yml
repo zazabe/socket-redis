@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+- '5'
+deploy:
+  provider: npm
+  email: tech@cargomedia.ch
+  api_key:
+    secure: yzc3nLGZm2ESNCtsE3tkPDe8goHm3WzZkbrm6gIK6D7VaBzJ6bEDuqNT73ZscmDLOHaCJ6k8kHEfnBkkZ/b2G2gS7kPHXbl3Ur+4VjJmNTwVE/tZqBVeMSsfxB3xbrkmV5vSOQ1AE+DcSBUYt3GmL/QtgFkRMtEO38Bu1rf2q7s=
+  on:
+    tags: true
+    repo: cargomedia/socket-redis
