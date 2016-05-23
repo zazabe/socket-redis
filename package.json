@@ -6,9 +6,6 @@
   "bin": {
     "socket-redis": "./bin/socket-redis.js"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": "",
   "keywords": [
     "redis",

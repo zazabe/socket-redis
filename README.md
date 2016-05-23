@@ -10,6 +10,15 @@ The server will let you consume client-related events like `message`, `subscribe
 
 When specifying multiple `--socket-ports` the script will spawn a child process for each port. This is provided as a simple way to make use of all your CPU cores.
 
+### Publishing
+ - update package.json with a new version
+ - release a new git tag with the updated package.json
+
+After that the npm release should be done automatically. If it didn't happen then release it manually:
+```
+npm publish https://github.com/cargomedia/socket-redis/archive/<GitTagWithUpdatedPackageJson>.tar.gz
+```
+
 
 Server
 ------
