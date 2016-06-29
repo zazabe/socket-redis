@@ -104,9 +104,22 @@ var SocketRedis = (function() {
   };
 
   Client.prototype.onopen = function() {
+    this._startHeartbeat();
   };
 
   Client.prototype.onclose = function() {
+    this._stopHeartbeat();
+  };
+
+  Client.prototype._startHeartbeat = function() {
+    this._heartbeatTimeout = setTimeout(function() {
+      sockJS.send(JSON.stringify({event: 'heartbeat'}));
+      this._startHeartbeat();
+    }.bind(this), 25 * 1000);
+  };
+
+  Client.prototype._stopHeartbeat = function() {
+    clearTimeout(this._heartbeatTimeout);
   };
 
   /**
