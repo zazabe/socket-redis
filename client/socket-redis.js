@@ -34,7 +34,7 @@ var SocketRedis = (function() {
           }
         }
         closeStamp = null;
-        handler.onopen.call(handler)
+        handler._onopen.call(handler)
       };
       sockJS.onmessage = function(event) {
         var data = JSON.parse(event.data);
@@ -45,7 +45,7 @@ var SocketRedis = (function() {
       sockJS.onclose = function() {
         closeStamp = new Date().getTime();
         retry();
-        handler.onclose.call(handler);
+        handler._onclose.call(handler);
       };
     });
 
@@ -104,10 +104,18 @@ var SocketRedis = (function() {
   };
 
   Client.prototype.onopen = function() {
-    this._startHeartbeat();
   };
 
   Client.prototype.onclose = function() {
+  };
+
+  Client.prototype._onopen = function() {
+    this._startHeartbeat();
+    this.onopen.call(this);
+  };
+
+  Client.prototype._onclose = function() {
+    this.onclose.call(this);
     this._stopHeartbeat();
   };
 
