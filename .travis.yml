@@ -5,7 +5,7 @@ deploy:
   provider: npm
   email: tech@cargomedia.ch
   api_key:
-    secure: yzc3nLGZm2ESNCtsE3tkPDe8goHm3WzZkbrm6gIK6D7VaBzJ6bEDuqNT73ZscmDLOHaCJ6k8kHEfnBkkZ/b2G2gS7kPHXbl3Ur+4VjJmNTwVE/tZqBVeMSsfxB3xbrkmV5vSOQ1AE+DcSBUYt3GmL/QtgFkRMtEO38Bu1rf2q7s=
+    secure: T9JDFeOOpD8EwQ89wIghHpQ6sfbf8r8ZAfTF+ZWa04IROOj3y355hx3SdfDHRryiFzafkD84LMZdIPCz42TY4hdZtcg00o1z1sU8UA7gUlI01nkz+z8FqgEFsKrs5lhpkqDAwCqLgK//ksv0n+YgaTwcPnGLCQhUNO6XoNgdx5U=
   on:
     tags: true
     repo: cargomedia/socket-redis
