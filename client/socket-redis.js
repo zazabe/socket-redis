@@ -143,12 +143,12 @@ var SocketRedis = (function() {
     var timeout;
     var resetDelay = function() {
       delay = delayMin;
-      window.clearTimeout(timeout);
+      clearTimeout(timeout);
     };
     var retry = function() {
       var self = this;
-      window.clearTimeout(timeout);
-      timeout = window.setTimeout(function() {
+      clearTimeout(timeout);
+      timeout = setTimeout(function() {
         execution.call(self, retry, resetDelay);
         delay = Math.min(Math.max(delayMin, delay * 2), delayMax);
       }, delay);
