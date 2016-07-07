@@ -48,15 +48,6 @@ var SocketRedis = (function() {
         handler._onclose.call(handler);
       };
     });
-
-    // https://github.com/sockjs/sockjs-client/issues/18
-    if (window.addEventListener) {
-      window.addEventListener('keydown', function(event) {
-        if (event.keyCode == 27) {
-          event.preventDefault();
-        }
-      })
-    }
   }
 
   /**
