@@ -1,7 +1,9 @@
+var SockJS = require('sockjs-client');
+
 /**
  * @class SocketRedis
  */
-var SocketRedis = (function() {
+module.exports = (function() {
 
   /**
    * @type {SockJS}
