@@ -96,6 +96,12 @@ module.exports = (function() {
     sockJS.send(JSON.stringify({event: 'publish', data: {channel: channel, event: event, data: data}}));
   };
 
+  Client.prototype.close = function() {
+    subscribes = {};
+    sockJS.onclose = null;
+    sockJS.close();
+  };
+
   Client.prototype.onopen = function() {
   };
 
