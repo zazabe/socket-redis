@@ -56,11 +56,14 @@ module.exports = (function() {
    * @param {String} channel
    * @param {Number} [start]
    * @param {Object} [data]
-   * @param {Function} [onmessage] fn(data)
+   * @param {Function} onmessage fn(data)
    */
   Client.prototype.subscribe = function(channel, start, data, onmessage) {
     if (subscribes[channel]) {
       throw 'Channel `' + channel + '` is already subscribed';
+    }
+    if (!onmessage) {
+      throw 'Please provide `onmessage` callback for channel: ' + channel;
     }
     subscribes[channel] = {event: {channel: channel, start: start, data: data}, callback: onmessage};
     if (sockJS.readyState === SockJS.OPEN) {
