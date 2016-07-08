@@ -141,7 +141,8 @@ module.exports = (function() {
     if (!startStamp) {
       startStamp = event.start || new Date().getTime();
     }
-    sockJS.send(JSON.stringify({event: 'subscribe', data: {channel: event.channel, data: event.data, start: startStamp}}));
+    var eventData = event.data || {};
+    sockJS.send(JSON.stringify({event: 'subscribe', data: {channel: event.channel, data: eventData, start: startStamp}}));
   };
 
   /**
