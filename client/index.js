@@ -6,51 +6,69 @@ var SockJS = require('sockjs-client');
 module.exports = (function() {
 
   /**
-   * @type {SockJS}
-   */
-  var sockJS;
-
-  /**
-   * @type {Object}
-   */
-  var subscribes = {};
-
-  /**
-   * @type {Number|Null}
-   */
-  var closeStamp = null;
-
-  /**
    * @param {String} url
    * @constructor
    */
   function Client(url) {
-    var handler = this;
-    retryDelayed(100, 5000, function(retry, resetDelay) {
-      sockJS = new SockJS(url);
-      sockJS.onopen = function() {
-        resetDelay();
-        for (var channel in subscribes) {
-          if (subscribes.hasOwnProperty(channel)) {
-            subscribe(channel, closeStamp);
-          }
-        }
-        closeStamp = null;
-        handler._onopen.call(handler)
-      };
-      sockJS.onmessage = function(event) {
-        var data = JSON.parse(event.data);
-        if (subscribes[data.channel]) {
-          subscribes[data.channel].callback.call(handler, data.event, data.data);
-        }
-      };
-      sockJS.onclose = function() {
-        closeStamp = new Date().getTime();
-        retry();
-        handler._onclose.call(handler);
-      };
-    });
+    /** @type {String} */
+    this._url = url;
+    /** @type {SockJS} */
+    this._sockJS = null;
+    /** @type {Number} */
+    this._closeStamp = null;
+    /** @type {Object} */
+    this._subscribes = {};
+    /** @type {Number} */
+    this._heartbeatTimeout = null;
+    /** @type {Number} */
+    this._recopenTimeout = null;
   }
+
+  Client.prototype.open = function() {
+    clearTimeout(this._recopenTimeout);
+    this._recopenTimeout = null;
+
+    this._sockJS = new SockJS(this._url);
+    this._sockJS.onopen = this._onopen.bind(this);
+    this._sockJS.onclose = this._recopen.bind(this);
+  };
+
+  Client.prototype._recopen = function() {
+    this._stopHeartbeat();
+    this._closeStamp = new Date().getTime();
+    this._sockJS.onopen = null;
+    this._sockJS.onclose = null;
+    this._sockJS = null;
+
+    this._recopenTimeout = setTimeout(function() {
+      this.open();
+    }.bind(this), 1000);
+  };
+
+  Client.prototype._onopen = function() {
+    var self = this;
+    Object.keys(this._subscribes).forEach(function(channel) {
+      self._subscribe(channel, self._closeStamp);
+    });
+
+    this._closeStamp = null;
+    this._sockJS.onmessage = function(event) {
+      var data = JSON.parse(event.data);
+      if (self._subscribes[data.channel]) {
+        self._subscribes[data.channel].callback.call(self, data.event, data.data);
+      }
+    };
+    this._startHeartbeat();
+    this.onopen.call(this);
+  };
+
+  Client.prototype.close = function() {
+    this._stopHeartbeat();
+    this._sockJS.onclose = null;
+
+    this._sockJS.close();
+    this.onclose.call(this);
+  };
 
   /**
    * @param {String} channel
@@ -59,15 +77,15 @@ module.exports = (function() {
    * @param {Function} onmessage fn(data)
    */
   Client.prototype.subscribe = function(channel, start, data, onmessage) {
-    if (subscribes[channel]) {
+    if (this._subscribes[channel]) {
       throw 'Channel `' + channel + '` is already subscribed';
     }
     if (!onmessage) {
       throw 'Please provide `onmessage` callback for channel: ' + channel;
     }
-    subscribes[channel] = {event: {channel: channel, start: start, data: data}, callback: onmessage};
-    if (sockJS.readyState === SockJS.OPEN) {
-      subscribe(channel);
+    this._subscribes[channel] = {event: {channel: channel, start: start, data: data}, callback: onmessage};
+    if (this._sockJS.readyState === SockJS.OPEN) {
+      this._subscribe(channel);
     }
   };
 
@@ -75,11 +93,11 @@ module.exports = (function() {
    * @param {String} channel
    */
   Client.prototype.unsubscribe = function(channel) {
-    if (subscribes[channel]) {
-      delete subscribes[channel];
+    if (this._subscribes[channel]) {
+      delete this._subscribes[channel];
     }
-    if (sockJS.readyState === SockJS.OPEN) {
-      sockJS.send(JSON.stringify({event: 'unsubscribe', data: {channel: channel}}));
+    if (this._sockJS.readyState === SockJS.OPEN) {
+      this._sockJS.send(JSON.stringify({event: 'unsubscribe', data: {channel: channel}}));
     }
   };
 
@@ -87,7 +105,7 @@ module.exports = (function() {
    * @param {Object} data
    */
   Client.prototype.send = function(data) {
-    sockJS.send(JSON.stringify({event: 'message', data: {data: data}}));
+    this._sockJS.send(JSON.stringify({event: 'message', data: {data: data}}));
   };
 
   /**
@@ -96,13 +114,7 @@ module.exports = (function() {
    * @param {Object} data
    */
   Client.prototype.publish = function(channel, event, data) {
-    sockJS.send(JSON.stringify({event: 'publish', data: {channel: channel, event: event, data: data}}));
-  };
-
-  Client.prototype.close = function() {
-    subscribes = {};
-    sockJS.onclose = null;
-    sockJS.close();
+    this._sockJS.send(JSON.stringify({event: 'publish', data: {channel: channel, event: event, data: data}}));
   };
 
   Client.prototype.onopen = function() {
@@ -111,61 +123,28 @@ module.exports = (function() {
   Client.prototype.onclose = function() {
   };
 
-  Client.prototype._onopen = function() {
-    this._startHeartbeat();
-    this.onopen.call(this);
-  };
-
-  Client.prototype._onclose = function() {
-    this.onclose.call(this);
-    this._stopHeartbeat();
+  /**
+   * @param {String} channel
+   * @param {Number} [startStamp]
+   */
+  Client.prototype._subscribe = function(channel, startStamp) {
+    var event = this._subscribes[channel].event;
+    if (!startStamp) {
+      startStamp = event.start || new Date().getTime();
+    }
+    var eventData = event.data || {};
+    this._sockJS.send(JSON.stringify({event: 'subscribe', data: {channel: event.channel, data: eventData, start: startStamp}}));
   };
 
   Client.prototype._startHeartbeat = function() {
     this._heartbeatTimeout = setTimeout(function() {
-      sockJS.send(JSON.stringify({event: 'heartbeat'}));
+      this._sockJS.send(JSON.stringify({event: 'heartbeat'}));
       this._startHeartbeat();
     }.bind(this), 25 * 1000);
   };
 
   Client.prototype._stopHeartbeat = function() {
     clearTimeout(this._heartbeatTimeout);
-  };
-
-  /**
-   * @param {String} channel
-   * @param {Number} [startStamp]
-   */
-  var subscribe = function(channel, startStamp) {
-    var event = subscribes[channel].event;
-    if (!startStamp) {
-      startStamp = event.start || new Date().getTime();
-    }
-    var eventData = event.data || {};
-    sockJS.send(JSON.stringify({event: 'subscribe', data: {channel: event.channel, data: eventData, start: startStamp}}));
-  };
-
-  /**
-   * @param {Number} delayMin
-   * @param {Number} delayMax
-   * @param {Function} execution fn({Function} retry, {Function} resetDelay)
-   */
-  var retryDelayed = function(delayMin, delayMax, execution) {
-    var delay = delayMin;
-    var timeout;
-    var resetDelay = function() {
-      delay = delayMin;
-      clearTimeout(timeout);
-    };
-    var retry = function() {
-      var self = this;
-      clearTimeout(timeout);
-      timeout = setTimeout(function() {
-        execution.call(self, retry, resetDelay);
-        delay = Math.min(Math.max(delayMin, delay * 2), delayMax);
-      }, delay);
-    };
-    execution.call(this, retry, resetDelay);
   };
 
   return Client;
