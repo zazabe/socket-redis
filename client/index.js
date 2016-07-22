@@ -21,26 +21,26 @@ module.exports = (function() {
     /** @type {Number} */
     this._heartbeatTimeout = null;
     /** @type {Number} */
-    this._recopenTimeout = null;
+    this._reopenTimeout = null;
   }
 
   Client.prototype.open = function() {
-    clearTimeout(this._recopenTimeout);
-    this._recopenTimeout = null;
+    clearTimeout(this._reopenTimeout);
+    this._reopenTimeout = null;
 
     this._sockJS = new SockJS(this._url);
     this._sockJS.onopen = this._onopen.bind(this);
-    this._sockJS.onclose = this._recopen.bind(this);
+    this._sockJS.onclose = this._reopen.bind(this);
   };
 
-  Client.prototype._recopen = function() {
+  Client.prototype._reopen = function() {
     this._stopHeartbeat();
     this._closeStamp = new Date().getTime();
     this._sockJS.onopen = null;
     this._sockJS.onclose = null;
     this._sockJS = null;
 
-    this._recopenTimeout = setTimeout(function() {
+    this._reopenTimeout = setTimeout(function() {
       this.open();
     }.bind(this), 1000);
   };
