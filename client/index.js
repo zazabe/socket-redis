@@ -82,7 +82,7 @@ module.exports = (function() {
       throw 'Channel `' + channel + '` is already subscribed';
     }
     this._subscribes[channel] = {event: {channel: channel, start: start, data: data}, callback: onmessage};
-    if (this._sockJS.readyState === SockJS.OPEN) {
+    if (this.isOpen()) {
       this._subscribe(channel);
     }
   };
@@ -94,9 +94,13 @@ module.exports = (function() {
     if (this._subscribes[channel]) {
       delete this._subscribes[channel];
     }
-    if (this._sockJS.readyState === SockJS.OPEN) {
+    if (this.isOpen()) {
       this._sockJS.send(JSON.stringify({event: 'unsubscribe', data: {channel: channel}}));
     }
+  };
+
+  Client.prototype.isOpen = function() {
+    return this._sockJS && this._sockJS.readyState === SockJS.OPEN;
   };
 
   /**
