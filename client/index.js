@@ -54,8 +54,9 @@ module.exports = (function() {
     this._closeStamp = null;
     this._sockJS.onmessage = function(event) {
       var data = JSON.parse(event.data);
-      if (self._subscribes[data.channel]) {
-        self._subscribes[data.channel].callback.call(self, data.event, data.data);
+      var subscribe = self._subscribes[data.channel];
+      if (subscribe && subscribe.callback) {
+        subscribe.callback.call(self, data.event, data.data);
       }
     };
     this._startHeartbeat();
@@ -74,14 +75,11 @@ module.exports = (function() {
    * @param {String} channel
    * @param {Number} [start]
    * @param {Object} [data]
-   * @param {Function} onmessage fn(data)
+   * @param {Function} [onmessage] fn(data)
    */
   Client.prototype.subscribe = function(channel, start, data, onmessage) {
     if (this._subscribes[channel]) {
       throw 'Channel `' + channel + '` is already subscribed';
-    }
-    if (!onmessage) {
-      throw 'Please provide `onmessage` callback for channel: ' + channel;
     }
     this._subscribes[channel] = {event: {channel: channel, start: start, data: data}, callback: onmessage};
     if (this._sockJS.readyState === SockJS.OPEN) {
