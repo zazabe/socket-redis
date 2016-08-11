@@ -1,4 +1,4 @@
-var SockJS = require('sockjs-client');
+var SockJS;
 
 /**
  * @class SocketRedis
@@ -25,6 +25,7 @@ Client.prototype.open = function() {
   clearTimeout(this._reopenTimeout);
   this._reopenTimeout = null;
 
+  SockJS = require('sockjs-client');
   this._sockJS = new SockJS(this._url);
   this._sockJS.onopen = this._onopen.bind(this);
   this._sockJS.onclose = this._reopen.bind(this);
