@@ -85,7 +85,7 @@ Client
 ### Building
 Client is written as a node module. If you want to access it as a global variable in browser then you need to browserify `client/index.js`. It will be exposed under `SocketRedis`. Also it requires a global variable `SockJS` that contains sockjs client.
 ```
-browserify --exclude sockjs-client --standalone SocketRedis ./client/index.js -o ./client/socket-redis.js
+browserify --standalone SocketRedis ./client/index.js -o ./client/socket-redis.js
 ```
 
 ### Installation
