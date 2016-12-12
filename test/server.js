@@ -1,0 +1,218 @@
+var assert = require('chai').assert;
+var _ = require('underscore');
+var requestPromise = require('request-promise');
+var redis = require('redis');
+var RedisServer = require('redis-server');
+var Server = require('../lib/server');
+
+describe.only('Server tests', function() {
+
+  var REDIS_PORT = 6379;
+  var REDIS_HOST = 'localhost';
+  var STATUS_PORT = 9993;
+
+  function getWorkerStub() {
+    return {pid: 'pid', kill: _.noop, send: _.noop};
+  }
+
+  before(function() {
+    this.redisServer = new RedisServer(REDIS_PORT);
+    return this.redisServer.open();
+  });
+
+  after(function() {
+    return this.redisServer.close();
+  });
+
+  beforeEach(function(done) {
+    this.server = new Server(REDIS_HOST, STATUS_PORT);
+    setTimeout(done, 100);
+  });
+
+  afterEach(function(done) {
+    this.server.stop();
+    setTimeout(done, 100);
+  });
+
+  it('creates Server', function() {
+    var server = this.server;
+    assert(server._redisClientDown.connected);
+    assert(server._redisClientUp.connected);
+    assert(server._statusServer.listening);
+  });
+
+  it('stops Server', function(done) {
+    var server = this.server;
+    server.stop();
+    _.delay(function() {
+      assert(!server._redisClientDown.connected);
+      assert(!server._redisClientUp.connected);
+      assert(!server._statusServer.listening);
+      done();
+    }, 200);
+  });
+
+  context('triggerEventUp', function() {
+    context('up messages', function() {
+      var originalPublish;
+      beforeEach(function() {
+        originalPublish = this.server._redisClientUp.publish;
+      });
+      afterEach(function() {
+        this.server._redisClientUp.publish = originalPublish;
+      });
+
+      it('up-message', function(done) {
+        var sampleMessage = {clientKey: 'up-message-clientKey', data: 'up-message-data'};
+        this.server._redisClientUp.publish = function(type, message) {
+          assert.equal(type, 'socket-redis-up');
+          message = JSON.parse(message);
+          assert.equal(message.type, 'message');
+          assert.deepEqual(message.data, sampleMessage);
+          done();
+        };
+        this.server.triggerEventUp('up-message', sampleMessage);
+      });
+
+      it('up-subscribe', function(done) {
+        var sampleMessage = {clientKey: 'up-subscribe-clientKey', data: 'up-subscribe-data', channel: 'up-subscribe-channel'};
+        this.server._redisClientUp.publish = function(type, message) {
+          assert.equal(type, 'socket-redis-up');
+          message = JSON.parse(message);
+          assert.equal(message.type, 'subscribe');
+          assert.deepEqual(message.data, sampleMessage);
+          done();
+        };
+        this.server.triggerEventUp('up-subscribe', sampleMessage);
+      });
+
+      it('up-unsubscribe', function(done) {
+        var sampleMessage = {clientKey: 'up-unsubscribe-clientKey', channel: 'up-unsubscribe-channel'};
+        this.server._redisClientUp.publish = function(type, message) {
+          assert.equal(type, 'socket-redis-up');
+          message = JSON.parse(message);
+          assert.equal(message.type, 'unsubscribe');
+          assert.deepEqual(message.data, sampleMessage);
+          done();
+        };
+        this.server.triggerEventUp('up-unsubscribe', sampleMessage);
+      });
+    });
+
+    context('down messages', function() {
+      var worker;
+      beforeEach(function() {
+        worker = getWorkerStub();
+        this.server.addWorker(worker);
+      });
+      afterEach(function() {
+        this.server.removeWorker(worker);
+      });
+
+      it('up-publish', function(done) {
+        worker.send = function(message) {
+          assert.equal(message.type, 'down-publish');
+          assert.deepEqual(message.data, sampleMessage);
+          done();
+        };
+        var sampleMessage = {channel: 'up-publish-channel', event: 'up-publish-clientKey', data: 'up-publish-data'};
+        this.server.triggerEventUp('up-publish', sampleMessage);
+      });
+    });
+
+    context('up-status-request', function() {
+      var statusRequest;
+      beforeEach(function() {
+        statusRequest = {
+          getId: function() {
+            return 111;
+          }
+        };
+        this.server.addStatusRequest(statusRequest);
+      });
+
+      afterEach(function() {
+        this.server.removeStatusRequest(statusRequest);
+      });
+
+      it('up-status-request', function(done) {
+        var sampleMessage = {requestId: statusRequest.getId(), channels: {channelId: []}};
+        statusRequest.addResponse = function(channels) {
+          assert.deepEqual(channels, sampleMessage.channels);
+          done();
+        };
+        this.server.triggerEventUp('up-status-request', sampleMessage);
+      });
+
+    });
+  });
+
+  context('status server', function() {
+    var statusServerUri = 'http://localhost:' + STATUS_PORT;
+
+    var worker;
+    beforeEach(function() {
+      worker = getWorkerStub();
+      this.server.addWorker(worker);
+    });
+    afterEach(function() {
+      this.server.removeWorker(worker);
+    });
+
+    it('statusRequest is added/removed', function(done) {
+      requestPromise({uri: statusServerUri, simple: false});
+
+      _.delay(function() {
+        var statusRequests = this.server.getStatusRequests();
+        assert.strictEqual(_.size(statusRequests), 1);
+        var statusRequest = statusRequests[Object.keys(statusRequests)[0]];
+        statusRequest.emit('complete');
+        assert.strictEqual(_.size(statusRequests), 0);
+        done();
+      }.bind(this), 100);
+    });
+
+    it('request is sent down', function(done) {
+      worker.send = function(message) {
+        assert.equal(message.type, 'down-status-request');
+        var statusRequests = this.server.getStatusRequests();
+        var statusRequest = statusRequests[Object.keys(statusRequests)[0]];
+        assert.deepEqual(message.data, {requestId: statusRequest.getId()});
+        done();
+      }.bind(this);
+      requestPromise(statusServerUri);
+    });
+  });
+
+  context('redisClientDown', function() {
+    var downPublisher;
+    var publishDown;
+    var worker;
+    beforeEach(function() {
+      worker = getWorkerStub();
+      this.server.addWorker(worker);
+
+      downPublisher = redis.createClient(REDIS_PORT, REDIS_HOST);
+      publishDown = function(message) {
+        downPublisher.publish('socket-redis-down', JSON.stringify(message));
+      };
+    });
+
+    afterEach(function() {
+      this.server.removeWorker(worker);
+      downPublisher.quit();
+    });
+
+    it('handles publish event', function(done) {
+      var sampleMessage = {type: 'publish', data: {channel: 'publish-channel', event: 'publish-event', data: 'publish-data'}};
+      worker.send = function(message) {
+        assert.equal(message.type, 'down-publish');
+        assert.deepEqual(message.data, sampleMessage.data);
+        done();
+      };
+      publishDown(sampleMessage);
+    });
+  });
+
+});
+
