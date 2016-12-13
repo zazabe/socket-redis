@@ -25,11 +25,12 @@
     "sockjs-client": "global:SockJS"
   },
   "dependencies": {
-    "underscore": "~1.7.0",
-    "sockjs": "0.3.17",
-    "redis": "~0.12.1",
-    "optimist": "~0.6.1",
     "log4js": "~0.6.21",
+    "optimist": "~0.6.1",
+    "redis": "~0.12.1",
+    "sockjs": "0.3.17",
+    "underscore": "~1.7.0",
+    "uuid": "^3.0.1",
     "validator": "~3.22.1"
   },
   "devDependencies": {
