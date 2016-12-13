@@ -5,7 +5,7 @@ var redis = require('redis');
 var RedisServer = require('redis-server');
 var Server = require('../lib/server');
 
-describe.only('Server tests', function() {
+describe('Server tests', function() {
 
   var REDIS_PORT = 6379;
   var REDIS_HOST = 'localhost';
