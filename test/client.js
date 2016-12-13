@@ -4,9 +4,13 @@ var SocketRedis = require('../client/index');
 
 describe('Client tests', function() {
 
-  var server = new Server();
+  var server;
 
-  after(function(){
+  before(function() {
+    server = new Server();
+  });
+
+  after(function() {
     server.terminate();
   });
 
