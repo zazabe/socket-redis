@@ -34,6 +34,7 @@ describe('Worker tests', function() {
 
   beforeEach(function() {
     this.worker = new Worker(9090);
+    this.worker._workerUtil._send = _.noop;
   });
 
   afterEach(function() {
@@ -49,16 +50,6 @@ describe('Worker tests', function() {
   });
 
   context('Proxy of messages', function() {
-    var processSend;
-
-    before(function() {
-      processSend = process.send;
-    });
-
-    after(function() {
-      process.send = processSend;
-    });
-
     beforeEach(function(done) {
       this.client = new SockjsClient('http://localhost:9090');
       this.client.onopen = function() {
@@ -77,13 +68,13 @@ describe('Worker tests', function() {
     context('connection send messages', function() {
       it('subscribe', function(done) {
         var expectedMessage = MESSAGES.subscribe;
-        process.send = function(actualMessage) {
-          process.send = _.noop;
+        this.worker._workerUtil._send = function(actualMessage) {
+          this.worker._workerUtil._send = _.noop;
           assert.equal(actualMessage.type, 'up-subscribe');
           assert.equal(actualMessage.data.channel, expectedMessage.data.channel);
           assert.equal(actualMessage.data.data, expectedMessage.data.data);
           done();
-        };
+        }.bind(this);
         this.client.send(JSON.stringify(expectedMessage));
       });
 
@@ -92,37 +83,37 @@ describe('Worker tests', function() {
 
         setTimeout(function() {
           var expectedMessage = MESSAGES.unsubscribe;
-          process.send = function(actualMessage) {
-            process.send = _.noop;
+          this.worker._workerUtil._send = function(actualMessage) {
+            this.worker._workerUtil._send = _.noop;
             assert.equal(actualMessage.type, 'up-unsubscribe');
             assert.equal(actualMessage.data.channel, expectedMessage.data.channel);
             done();
-          };
+          }.bind(this);
           this.client.send(JSON.stringify(expectedMessage));
         }.bind(this), 0);
       });
 
       it('message', function(done) {
         var expectedMessage = MESSAGES.message;
-        process.send = function(actualMessage) {
-          process.send = _.noop;
+        this.worker._workerUtil._send = function(actualMessage) {
+          this.worker._workerUtil._send = _.noop;
           assert.equal(actualMessage.type, 'up-message');
           assert.equal(actualMessage.data.data, expectedMessage.data.data);
           done();
-        };
+        }.bind(this);
         this.client.send(JSON.stringify(expectedMessage));
       });
 
       it('publish', function(done) {
         var expectedMessage = MESSAGES.publish;
-        process.send = function(actualMessage) {
-          process.send = _.noop;
+        this.worker._workerUtil._send = function(actualMessage) {
+          this.worker._workerUtil._send = _.noop;
           assert.equal(actualMessage.type, 'up-publish');
           assert.equal(actualMessage.data.channel, expectedMessage.data.channel);
           assert.equal(actualMessage.data.data, expectedMessage.data.data);
           assert.equal(actualMessage.data.event, 'client-' + expectedMessage.data.event);
           done();
-        };
+        }.bind(this);
         this.client.send(JSON.stringify(expectedMessage));
       });
     });
@@ -134,8 +125,8 @@ describe('Worker tests', function() {
 
         setTimeout(function() {
           var eventData = {requestId: 'request-id'};
-          process.send = function(actualMessage) {
-            process.send = _.noop;
+          this.worker._workerUtil._send = function(actualMessage) {
+            this.worker._workerUtil._send = _.noop;
             assert.equal(actualMessage.type, 'up-status-request');
             assert.equal(actualMessage.data.requestId, eventData.requestId);
             var actualChannel = actualMessage.data.channels[subscribeMessage.data.channel][0];
@@ -144,15 +135,15 @@ describe('Worker tests', function() {
             assert(actualChannel.subscribeStamp);
             assert.equal(actualChannel.data, subscribeMessage.data.data);
             done();
-          };
+          }.bind(this);
           this.worker.triggerEventDown('down-status-request', eventData);
         }.bind(this), 0);
       });
 
       it('down-publish', function(done) {
         var subscribeMessage = MESSAGES.subscribe;
-        process.send = function(message) {
-          process.send = _.noop;
+        this.worker._workerUtil._send = function(message) {
+          this.worker._workerUtil._send = _.noop;
           assert.equal(message.type, 'up-subscribe');
           this.client.onmessage = function(event) {
             var message = JSON.parse(event.data);
@@ -160,7 +151,7 @@ describe('Worker tests', function() {
             assert.equal(message.event, eventData.event);
             assert.equal(message.data, eventData.data);
             done();
-          };
+          }.bind(this);
           var eventData = {channel: subscribeMessage.data.channel, event: 'down-publish-event', data: 'down publish data'};
           this.worker.triggerEventDown('down-publish', eventData);
         }.bind(this);
