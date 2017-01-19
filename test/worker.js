@@ -34,7 +34,7 @@ describe('Worker tests', function() {
 
   beforeEach(function() {
     this.worker = new Worker(9090);
-    this.worker._workerUtil._send = _.noop;
+    this.worker._workerSender._send = _.noop;
   });
 
   afterEach(function() {
@@ -68,8 +68,8 @@ describe('Worker tests', function() {
     context('connection send messages', function() {
       it('subscribe', function(done) {
         var expectedMessage = MESSAGES.subscribe;
-        this.worker._workerUtil._send = function(actualMessage) {
-          this.worker._workerUtil._send = _.noop;
+        this.worker._workerSender._send = function(actualMessage) {
+          this.worker._workerSender._send = _.noop;
           assert.equal(actualMessage.type, 'up-subscribe');
           assert.equal(actualMessage.data.channel, expectedMessage.data.channel);
           assert.equal(actualMessage.data.data, expectedMessage.data.data);
@@ -83,8 +83,8 @@ describe('Worker tests', function() {
 
         setTimeout(function() {
           var expectedMessage = MESSAGES.unsubscribe;
-          this.worker._workerUtil._send = function(actualMessage) {
-            this.worker._workerUtil._send = _.noop;
+          this.worker._workerSender._send = function(actualMessage) {
+            this.worker._workerSender._send = _.noop;
             assert.equal(actualMessage.type, 'up-unsubscribe');
             assert.equal(actualMessage.data.channel, expectedMessage.data.channel);
             done();
@@ -95,8 +95,8 @@ describe('Worker tests', function() {
 
       it('message', function(done) {
         var expectedMessage = MESSAGES.message;
-        this.worker._workerUtil._send = function(actualMessage) {
-          this.worker._workerUtil._send = _.noop;
+        this.worker._workerSender._send = function(actualMessage) {
+          this.worker._workerSender._send = _.noop;
           assert.equal(actualMessage.type, 'up-message');
           assert.equal(actualMessage.data.data, expectedMessage.data.data);
           done();
@@ -106,8 +106,8 @@ describe('Worker tests', function() {
 
       it('publish', function(done) {
         var expectedMessage = MESSAGES.publish;
-        this.worker._workerUtil._send = function(actualMessage) {
-          this.worker._workerUtil._send = _.noop;
+        this.worker._workerSender._send = function(actualMessage) {
+          this.worker._workerSender._send = _.noop;
           assert.equal(actualMessage.type, 'up-publish');
           assert.equal(actualMessage.data.channel, expectedMessage.data.channel);
           assert.equal(actualMessage.data.data, expectedMessage.data.data);
@@ -125,8 +125,8 @@ describe('Worker tests', function() {
 
         setTimeout(function() {
           var eventData = {requestId: 'request-id'};
-          this.worker._workerUtil._send = function(actualMessage) {
-            this.worker._workerUtil._send = _.noop;
+          this.worker._workerSender._send = function(actualMessage) {
+            this.worker._workerSender._send = _.noop;
             assert.equal(actualMessage.type, 'up-status-request');
             assert.equal(actualMessage.data.requestId, eventData.requestId);
             var actualChannel = actualMessage.data.channels[subscribeMessage.data.channel][0];
@@ -142,8 +142,8 @@ describe('Worker tests', function() {
 
       it('down-publish', function(done) {
         var subscribeMessage = MESSAGES.subscribe;
-        this.worker._workerUtil._send = function(message) {
-          this.worker._workerUtil._send = _.noop;
+        this.worker._workerSender._send = function(message) {
+          this.worker._workerSender._send = _.noop;
           assert.equal(message.type, 'up-subscribe');
           this.client.onmessage = function(event) {
             var message = JSON.parse(event.data);
