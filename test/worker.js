@@ -33,7 +33,7 @@ describe('Worker tests', function() {
   });
 
   beforeEach(function() {
-    this.worker = new Worker(9090);
+    this.worker = new Worker(process, 9090);
     this.worker._workerSender._send = _.noop;
   });
 
