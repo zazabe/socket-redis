@@ -60,7 +60,7 @@ if (!process.send) {
   });
 
   process.on('SIGTERM', function() {
-    publisher.killWorkers();
+    publisher.stop();
     process.exit();
   });
 
