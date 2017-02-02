@@ -44,6 +44,7 @@ Available options:
 - `--log-dir` Directory where log is stored. Script will try to create directory if needed. Defaults to `null` which means it will output to stdout.
 - `--sockjs-client-url` Specify custom url for sockjs-client library.
 - `--status-port` Specify port for http status requests. It should not be publicly accesible. Defaults to `8085`
+- `--status-secret` Specify secret token to allow/deny http status requests.
 - `--ssl-key` Specify ssl private key file. Combine with `ssl-cert` option.
 - `--ssl-cert` Specify ssl public certificate file. Combine with `ssl-key` option. Append CA-chain within this file.
 - `--ssl-pfx` Specify ssl pfx file (key + cert). Overrides `ssl-key` and `ssl-cert` options.

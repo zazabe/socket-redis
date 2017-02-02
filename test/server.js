@@ -10,6 +10,7 @@ describe('Server tests', function() {
   var REDIS_PORT = 6379;
   var REDIS_HOST = 'localhost';
   var STATUS_PORT = 9993;
+  var STATUS_SECRET = 'secret';
 
   function getWorkerStub() {
     return {pid: 'pid', kill: _.noop, send: _.noop};
@@ -25,7 +26,7 @@ describe('Server tests', function() {
   });
 
   beforeEach(function(done) {
-    this.server = new Server(REDIS_HOST, STATUS_PORT);
+    this.server = new Server(REDIS_HOST, STATUS_PORT, STATUS_SECRET);
     setTimeout(done, 100);
   });
 
@@ -160,7 +161,7 @@ describe('Server tests', function() {
     });
 
     it('statusRequest is added/removed', function(done) {
-      requestPromise({uri: statusServerUri, simple: false});
+      requestPromise({uri: statusServerUri, headers: {'Authorization': 'Token ' + STATUS_SECRET}, simple: false});
 
       _.delay(function() {
         var statusRequests = this.server._statusServer.getStatusRequests();
@@ -180,7 +181,18 @@ describe('Server tests', function() {
         assert.deepEqual(message.data, {requestId: statusRequest.getId()});
         done();
       }.bind(this);
-      requestPromise(statusServerUri);
+      requestPromise({uri: statusServerUri, headers: {'Authorization': 'Token ' + STATUS_SECRET}});
+    });
+
+    it('rejects unauthenticated', function(done) {
+      requestPromise(statusServerUri)
+        .then(function() {
+          done(new Error('Unauthenticated request must be rejected'));
+        })
+        .catch(function(error) {
+          assert.include(error.message, 'not authenticated');
+          done();
+        });
     });
   });
 

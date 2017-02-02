@@ -21,7 +21,7 @@ if (logDir) {
 if (!process.send) {
   argv = optimist.default('socket-ports', '8090').default('status-port', '8085').argv;
   var socketPorts = String(argv['socket-ports']).split(',');
-  var publisher = new socketRedis.Server(redisHost, argv['status-port']);
+  var publisher = new socketRedis.Server(redisHost, argv['status-port'], argv['status-secret']);
 
   socketPorts.forEach(function(socketPort) {
     var args = ['--socket-port=' + socketPort];
