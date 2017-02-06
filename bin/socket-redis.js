@@ -60,7 +60,7 @@ if (!process.send) {
   });
 
   process.on('SIGTERM', function() {
-    publisher.killWorkers();
+    publisher.stop();
     process.exit();
   });
 
@@ -91,7 +91,7 @@ if (!process.send) {
     sslOptions.passphrase = fs.readFileSync(sslPassphrase).toString().trim();
   }
   var socketPort = argv['socket-port'];
-  var worker = new socketRedis.Worker(socketPort, sockjsClientUrl, sslOptions);
+  var worker = new socketRedis.Worker(process, socketPort, sockjsClientUrl, sslOptions);
   process.on('message', function(event) {
     worker.triggerEventDown(event.type, event.data);
   });
