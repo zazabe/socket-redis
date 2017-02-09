@@ -107,6 +107,7 @@ socketRedis.onopen = function() {
 
 	socketRedis.unsubscribe('channel-name');
 };
+socketRedis.open();
 ```
 
 To publish messages to a channel from the client:
