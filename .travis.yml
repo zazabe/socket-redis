@@ -12,9 +12,11 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
   - docker-compose pull
+  - docker-compose build socket-redis
+  - docker-compose -f ./docker-compose.test.yml build test-socket-redis
 
 script:
-  - ./docker-ci.sh
+  - docker-compose -f ./docker-compose.test.yml run test-socket-redis
 
 deploy:
   provider: npm

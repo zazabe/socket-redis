@@ -79,8 +79,6 @@ Tests can be run locally with docker:
 docker-compose -f docker-compose.test.yml run test-socket-redis
 ```
 
-*Note: travis is also using docker to test socket-redis, with the `./docker-ci.sh` command.*
-
 ### Messages published to redis pub/sub channel `socket-redis-up`:
 - `{type: "subscribe", data: {channel: <channel>, clientKey: <clientKey>, data: <subscribe-data>}}`
 - `{type: "unsubscribe", data: {channel: <channel>, clientKey: <clientKey>}}`
