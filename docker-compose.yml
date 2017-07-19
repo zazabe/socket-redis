@@ -1,0 +1,26 @@
+version: '3.2'
+services:
+  socket-redis:
+    build: .
+    image: cargomedia/socket-redis:latest
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SOCKET_PORTS=8090
+      - STATUS_PORT=8085
+      - STATUS_TOKEN=
+    ports:
+      - "8085:8085"
+      - "8090:8090"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:3.2.6
+    command: '/redis/config/redis.conf'
+    volumes:
+      - data-redis:/data
+      - ./docker/config/redis/redis.conf:/redis/config/redis.conf
+
+volumes:
+  data-redis:

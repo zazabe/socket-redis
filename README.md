@@ -50,6 +50,27 @@ Available options:
 - `--ssl-pfx` Specify ssl pfx file (key + cert). Overrides `ssl-key` and `ssl-cert` options.
 - `--ssl-passphrase` Specify file containing the ssl passphrase.
 
+#### with Docker
+
+- build (optinally, select the node version with the build argument "FROM_TAG", 6 by default)  
+```
+docker build . -t cargomedia/socket-redis:latest [--build-arg "FROM_TAG:<node version>"]
+```
+- run (see all environment variables available below)   
+```
+docker run -e REDIS_HOST=<host> cargomedia/socket-redis:latest
+```
+- test locally with a redis container   
+```
+docker-compose run socket-redis
+```
+
+Environment variables:
+- `REDIS_HOST=redis`
+- `REDIS_PORT=6379`
+- `SOCKET_PORTS=8090`
+- `STATUS_PORT=8085`
+- `STATUS_TOKEN`
 
 ### Messages published to redis pub/sub channel `socket-redis-up`:
 - `{type: "subscribe", data: {channel: <channel>, clientKey: <clientKey>, data: <subscribe-data>}}`
