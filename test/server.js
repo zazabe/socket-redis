@@ -2,28 +2,18 @@ var assert = require('chai').assert;
 var _ = require('underscore');
 var requestPromise = require('request-promise');
 var redis = require('redis');
-var RedisServer = require('redis-server');
 var Server = require('../lib/server');
 
 describe('Server tests', function() {
 
-  var REDIS_PORT = 6379;
-  var REDIS_HOST = 'localhost';
-  var STATUS_PORT = 9993;
-  var STATUS_SECRET = 'secret';
+  var REDIS_PORT = process.env.REDIS_PORT || 6379;
+  var REDIS_HOST = process.env.REDIS_HOST || 'localhost';
+  var STATUS_PORT = process.env.STATUS_PORT || 9993;
+  var STATUS_SECRET = process.env.STATUS_SECRET || 'secret';
 
   function getWorkerStub() {
     return {pid: 'pid', kill: _.noop, send: _.noop};
   }
-
-  before(function() {
-    this.redisServer = new RedisServer(REDIS_PORT);
-    return this.redisServer.open();
-  });
-
-  after(function() {
-    return this.redisServer.close();
-  });
 
   beforeEach(function(done) {
     this.server = new Server(REDIS_HOST, STATUS_PORT, STATUS_SECRET);
