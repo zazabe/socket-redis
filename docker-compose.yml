@@ -3,15 +3,11 @@ services:
   socket-redis:
     build: .
     image: cargomedia/socket-redis:latest
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - SOCKET_PORTS=8090
-      - STATUS_PORT=8085
-      - STATUS_TOKEN=
+    command: --redis-host=redis --status-port=8085 --socket-ports=8090,8091 --status-secret=foo
     ports:
       - "8085:8085"
       - "8090:8090"
+      - "8091:8091"
     depends_on:
       - redis
 

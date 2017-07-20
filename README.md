@@ -52,31 +52,24 @@ Available options:
 
 #### with Docker
 
-- build (optinally, select the node version with the build argument "FROM_TAG", 6 by default)  
 ```
-docker build . -t cargomedia/socket-redis:latest [--build-arg "FROM_TAG:<node version>"]
-```
-- run (see all environment variables available below)   
-```
-docker run -e REDIS_HOST=<host> cargomedia/socket-redis:latest
-```
-- test locally with a redis container   
-```
-docker-compose run socket-redis
+docker-compose up socket-redis
 ```
 
-Environment variables:
-- `REDIS_HOST=redis`
-- `REDIS_PORT=6379`
-- `SOCKET_PORTS=8090`
-- `STATUS_PORT=8085`
-- `STATUS_TOKEN`
+In development, you can mount the repository has a volume and expose ports manually
+```
+docker-compose run --volume $(pwd):/opt/socket-redis -p 8085:8085 -p 8090:8090 -p 8091:8091 socket-redis
+```
 
 ### Test
 
-Tests can be run locally with docker:
 ```
-docker-compose -f docker-compose.test.yml run test-socket-redis
+docker-compose run -e REDIS_HOST=redis --entrypoint ./bin/docker-test.sh socket-redis
+```
+
+In development, you can mount the repository as a volume, then node modules will be installed on you host an reused for each run
+```
+docker-compose run --volume $(pwd):/opt/socket-redis -e REDIS_HOST=redis --entrypoint ./bin/docker-test.sh socket-redis
 ```
 
 ### Messages published to redis pub/sub channel `socket-redis-up`:

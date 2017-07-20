@@ -1,24 +1,11 @@
-ARG FROM_TAG=6
-FROM node:${FROM_TAG}
+FROM node:6
 
-WORKDIR '/app'
+WORKDIR '/opt/socket-redis'
 
 RUN apt-get update && apt-get install -y redis-tools
-
 COPY package.json ./
-RUN npm install
+RUN npm install --only=production
+COPY . ./
 
-COPY docker ./docker
-COPY bin ./bin
-COPY lib ./lib
-COPY client ./client
-COPY socket-redis.js ./
-
-ENV REDIS_HOST=redis
-ENV SOCKET_PORTS=8090
-ENV STATUS_PORT=8085
-ENV STATUS_TOKEN=""
-
-EXPOSE 8085
-ENTRYPOINT ["./docker/run.sh"]
-CMD ["start"]
+EXPOSE 8085 8090 8091
+ENTRYPOINT ["./bin/socket-redis.js"]

@@ -26,11 +26,6 @@ function test_redis {
   redis-cli -h "${REDIS_HOST}" PING &>/dev/null
 }
 
-ACTION=${1:-start}; shift
-
 app_wait_redis
-if [ "${ACTION}" == 'start' ]; then
-  ./bin/socket-redis.js --redis-host=${REDIS_HOST}:${REDIS_PORT} --status-port=${STATUS_PORT} --socket-ports=${SOCKET_PORTS} --status-secret=${STATUS_TOKEN}
-else
-  npm run --prefix /app "${ACTION}" "${@}"
-fi
+npm install
+npm test

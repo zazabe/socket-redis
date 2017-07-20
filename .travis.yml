@@ -19,10 +19,9 @@ before_install:
   - docker-compose --version
   - docker-compose pull
   - docker-compose build socket-redis
-  - docker-compose -f ./docker-compose.test.yml build test-socket-redis
 
 script:
-  - docker-compose -f ./docker-compose.test.yml run test-socket-redis
+  - docker-compose run -e REDIS_HOST=redis --entrypoint ./bin/docker-test.sh socket-redis
 
 deploy:
   provider: npm
