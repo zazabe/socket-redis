@@ -8,4 +8,4 @@ RUN npm install --only=production
 COPY . ./
 
 EXPOSE 8085 8090 8091
-ENTRYPOINT ["./bin/socket-redis.js"]
+CMD ["./bin/socket-redis.js"]
