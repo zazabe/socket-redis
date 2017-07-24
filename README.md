@@ -64,12 +64,12 @@ docker-compose run --volume $(pwd):/opt/socket-redis -p 8085:8085 -p 8090:8090 -
 ### Test
 
 ```
-docker-compose run -e REDIS_HOST=redis --entrypoint ./bin/docker-test.sh socket-redis
+docker-compose run -e REDIS_HOST=redis socket-redis ./bin/test.sh
 ```
 
 In development, you can mount the repository as a volume, then node modules will be installed on you host an reused for each run
 ```
-docker-compose run --volume $(pwd):/opt/socket-redis -e REDIS_HOST=redis --entrypoint ./bin/docker-test.sh socket-redis
+docker-compose run --volume $(pwd):/opt/socket-redis -e REDIS_HOST=redis socket-redis ./bin/test.sh
 ```
 
 ### Messages published to redis pub/sub channel `socket-redis-up`:
