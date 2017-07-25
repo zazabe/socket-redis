@@ -23,11 +23,7 @@ deploy:
       tags: true
       repo: cargomedia/socket-redis
   - provider: script
-    script:
-      - docker build . -t socket-redis:latest
-      - docker tag socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
-      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      - docker push "cargomedia/socket-redis:$TRAVIS_TAG"
+    script: ./script/docker-push.sh
     on:
       tags: true
       repo: zazabe/socket-redis
