@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-source "/var/lib/docker/utils.sh"
-
-wait_services redis
+wait-for-it redis:6379
 npm install
 npm test

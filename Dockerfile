@@ -2,8 +2,8 @@ FROM node:6
 
 WORKDIR '/opt/socket-redis'
 
-ADD https://git.io/v7mLR /var/lib/docker/utils.sh
-RUN apt-get update && apt-get install -y redis-tools
+ADD https://git.io/vyCoJ /usr/local/bin/wait-for-it
+RUN chmod a+x /usr/local/bin/wait-for-it
 COPY package.json ./
 RUN npm install --only=production
 COPY . ./
