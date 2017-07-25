@@ -24,7 +24,7 @@ jobs:
       provider: npm
       email: tech@cargomedia.ch
       api_key:
-        secure: T9JDFeOOpD8EwQ89wIghHpQ6sfbf8r8ZAfTF+ZWa04IROOj3y355hx3SdfDHRryiFzafkD84LMZdIPCz42TY4hdZtcg00o1z1sU8UA7gUlI01nkz+z8FqgEFsKrs5lhpkqDAwCqLgK//ksv0n+YgaTwcPnGLCQhUNO6XoNgdx5U=
+        secure: $NPM_API_KEY
       on:
         tags: true
 
@@ -39,5 +39,5 @@ jobs:
         - docker tag socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker push "cargomedia/socket-redis:$TRAVIS_TAG"
-      on:
-        tags: true
+#      on:
+#        tags: true
