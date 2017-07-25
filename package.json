@@ -1,5 +1,5 @@
 {
-  "name": "socket-redis",
+  "name": "@cargomedia/socket-redis",
   "version": "3.1.0",
   "description": "Redis to SockJS relay",
   "main": "socket-redis.js",
