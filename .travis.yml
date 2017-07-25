@@ -11,16 +11,15 @@ install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
-  - docker-compose pull
-  - docker-compose build socket-redis
-
-script:
-      - docker-compose run -e REDIS_HOST=redis socket-redis ./script/test.sh
 
 jobs:
   include:
+  - stage: test
+    script: docker-compose run -e REDIS_HOST=redis socket-redis ./script/test.sh
+
   - stage: deploy
-    script: echo "Deploying to npm..."
+    install: false
+    script: skip
     deploy:
       provider: npm
       email: tech@cargomedia.ch
@@ -30,12 +29,15 @@ jobs:
         tags: true
 
   - stage: push
-    script: echo "Pushing to hub.docker.com..."
+    install: false
+    script: skip
     deploy:
       provider: script
+      skip_cleanup: true
       script:
+        - docker build . -t socket-redis:latest
+        - docker tag socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-        - docker tag cargomedia/socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
         - docker push "cargomedia/socket-redis:$TRAVIS_TAG"
       on:
         tags: true
