@@ -39,5 +39,4 @@ jobs:
         - docker tag socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker push "cargomedia/socket-redis:$TRAVIS_TAG"
-#      on:
-#        tags: true
+
