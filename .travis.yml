@@ -6,28 +6,36 @@ services:
 env:
   DOCKER_COMPOSE_VERSION: 1.13.0
 
-before_install:
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - sudo apt-get update
-  - sudo apt-get -y install docker-ce
+install:
   - sudo rm /usr/local/bin/docker-compose
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
-  - docker --version
-  - docker-compose --version
   - docker-compose pull
   - docker-compose build socket-redis
 
 script:
-  - docker-compose run -e REDIS_HOST=redis --entrypoint ./bin/docker-test.sh socket-redis
+      - docker-compose run -e REDIS_HOST=redis socket-redis ./script/test.sh
 
-deploy:
-  provider: npm
-  email: tech@cargomedia.ch
-  api_key:
-    secure: T9JDFeOOpD8EwQ89wIghHpQ6sfbf8r8ZAfTF+ZWa04IROOj3y355hx3SdfDHRryiFzafkD84LMZdIPCz42TY4hdZtcg00o1z1sU8UA7gUlI01nkz+z8FqgEFsKrs5lhpkqDAwCqLgK//ksv0n+YgaTwcPnGLCQhUNO6XoNgdx5U=
-  on:
-    tags: true
-    repo: cargomedia/socket-redis
+jobs:
+  include:
+   - stage: deploy
+     script: echo "Deploying to npm..."
+     deploy:
+       provider: npm
+       email: tech@cargomedia.ch
+       api_key:
+         secure: T9JDFeOOpD8EwQ89wIghHpQ6sfbf8r8ZAfTF+ZWa04IROOj3y355hx3SdfDHRryiFzafkD84LMZdIPCz42TY4hdZtcg00o1z1sU8UA7gUlI01nkz+z8FqgEFsKrs5lhpkqDAwCqLgK//ksv0n+YgaTwcPnGLCQhUNO6XoNgdx5U=
+       on:
+         tags: true
+
+   - stage: push
+     script: echo "Pushing to hub.docker.com..."
+    deploy:
+       provider: script
+         script:
+          - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+          - docker tag cargomedia/socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
+          - docker push "cargomedia/socket-redis:$TRAVIS_TAG"
+         on:
+           tags: true
