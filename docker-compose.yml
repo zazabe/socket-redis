@@ -1,0 +1,22 @@
+version: '3.2'
+services:
+  socket-redis:
+    build: .
+    image: cargomedia/socket-redis:latest
+    command: ./bin/socket-redis.js --redis-host=redis --status-port=8085 --socket-ports=8090,8091 --status-secret=foo
+    ports:
+      - "8085:8085"
+      - "8090:8090"
+      - "8091:8091"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:3.2.6
+    command: '/redis/config/redis.conf'
+    volumes:
+      - data-redis:/data
+      - ./docker/config/redis/redis.conf:/redis/config/redis.conf
+
+volumes:
+  data-redis:
