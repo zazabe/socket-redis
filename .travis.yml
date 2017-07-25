@@ -22,8 +22,3 @@ deploy:
     on:
       tags: true
       repo: cargomedia/socket-redis
-  - provider: script
-    script: ./script/docker-push.sh
-    on:
-      tags: true
-      repo: zazabe/socket-redis
