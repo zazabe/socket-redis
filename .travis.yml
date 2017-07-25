@@ -1,5 +1,7 @@
 sudo: required
-
+language: node_js
+node_js:
+  - '6'
 services:
   - docker
 
@@ -15,10 +17,10 @@ install:
 script: docker-compose run -e REDIS_HOST=redis socket-redis ./script/test.sh
 
 deploy:
-  - provider: npm
-    email: tech@cargomedia.ch
-    api_key:
-      secure: lWKcrqKmMBXNV57HE5oSwSRR2YoxGOw7tFg1AjVAupV7S0EnuMMZ0YqUYHgnAQctmhlHwF/5yG7oaoCYEDzbI3r2mxxCA1vuu0mJJ4gv7YmB6JKbhjhXvBsuLOKp0WSrCTqmH2Rr2jZ/YLW6auSGcHkjoQkrbeFUxIl0V1CibWI=
-    on:
-      tags: true
-      repo: cargomedia/socket-redis
+  provider: npm
+  email: tech@cargomedia.ch
+  api_key:
+    secure: lWKcrqKmMBXNV57HE5oSwSRR2YoxGOw7tFg1AjVAupV7S0EnuMMZ0YqUYHgnAQctmhlHwF/5yG7oaoCYEDzbI3r2mxxCA1vuu0mJJ4gv7YmB6JKbhjhXvBsuLOKp0WSrCTqmH2Rr2jZ/YLW6auSGcHkjoQkrbeFUxIl0V1CibWI=
+  on:
+    tags: true
+    repo: cargomedia/socket-redis
