@@ -12,31 +12,22 @@ install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
-jobs:
-  include:
-  - stage: test
-    script: docker-compose run -e REDIS_HOST=redis socket-redis ./script/test.sh
+script: docker-compose run -e REDIS_HOST=redis socket-redis ./script/test.sh
 
-  - stage: deploy
-    install: false
-    script: skip
-    deploy:
-      provider: npm
-      email: tech@cargomedia.ch
-      api_key:
-        secure: $NPM_API_KEY
-      on:
-        tags: true
-
-  - stage: push
-    install: false
-    script: skip
-    deploy:
-      provider: script
-      skip_cleanup: true
-      script:
-        - docker build . -t socket-redis:latest
-        - docker tag socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
-        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-        - docker push "cargomedia/socket-redis:$TRAVIS_TAG"
-
+deploy:
+  - provider: npm
+    email: tech@cargomedia.ch
+    api_key:
+      secure: $NPM_API_KEY
+    on:
+      tags: true
+      repo: cargomedia/socket-redis
+  - provider: script
+    script:
+      - docker build . -t socket-redis:latest
+      - docker tag socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
+      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      - docker push "cargomedia/socket-redis:$TRAVIS_TAG"
+    on:
+      tags: true
+      repo: zazabe/socket-redis
