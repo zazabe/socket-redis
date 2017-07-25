@@ -16,10 +16,6 @@ install:
 
 script: docker-compose run -e REDIS_HOST=redis socket-redis ./script/test.sh
 
-before_deploy:
-  - node --version
-  - npm --version
-
 deploy:
   provider: npm
   email: tech@cargomedia.ch
