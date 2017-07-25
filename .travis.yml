@@ -17,8 +17,7 @@ script: docker-compose run -e REDIS_HOST=redis socket-redis ./script/test.sh
 deploy:
   - provider: npm
     email: tech@cargomedia.ch
-    api_key:
-      secure: $NPM_API_KEY
+    api_key: $NPM_API_KEY
     on:
       tags: true
       repo: cargomedia/socket-redis
