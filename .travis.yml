@@ -19,23 +19,23 @@ script:
 
 jobs:
   include:
-   - stage: deploy
-     script: echo "Deploying to npm..."
-     deploy:
-       provider: npm
-       email: tech@cargomedia.ch
-       api_key:
-         secure: T9JDFeOOpD8EwQ89wIghHpQ6sfbf8r8ZAfTF+ZWa04IROOj3y355hx3SdfDHRryiFzafkD84LMZdIPCz42TY4hdZtcg00o1z1sU8UA7gUlI01nkz+z8FqgEFsKrs5lhpkqDAwCqLgK//ksv0n+YgaTwcPnGLCQhUNO6XoNgdx5U=
-       on:
-         tags: true
-
-   - stage: push
-     script: echo "Pushing to hub.docker.com..."
+  - stage: deploy
+    script: echo "Deploying to npm..."
     deploy:
-       provider: script
-         script:
-          - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-          - docker tag cargomedia/socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
-          - docker push "cargomedia/socket-redis:$TRAVIS_TAG"
-         on:
-           tags: true
+      provider: npm
+      email: tech@cargomedia.ch
+      api_key:
+        secure: T9JDFeOOpD8EwQ89wIghHpQ6sfbf8r8ZAfTF+ZWa04IROOj3y355hx3SdfDHRryiFzafkD84LMZdIPCz42TY4hdZtcg00o1z1sU8UA7gUlI01nkz+z8FqgEFsKrs5lhpkqDAwCqLgK//ksv0n+YgaTwcPnGLCQhUNO6XoNgdx5U=
+      on:
+        tags: true
+
+  - stage: push
+    script: echo "Pushing to hub.docker.com..."
+    deploy:
+      provider: script
+      script:
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+        - docker tag cargomedia/socket-redis:latest "cargomedia/socket-redis:$TRAVIS_TAG"
+        - docker push "cargomedia/socket-redis:$TRAVIS_TAG"
+      on:
+        tags: true
